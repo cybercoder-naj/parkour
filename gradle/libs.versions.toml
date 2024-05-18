@@ -2,3 +2,7 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 [versions]
 lib = "0.0.1"
+dokkaVer = "1.9.20"
+
+[plugins]
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokkaVer" }
