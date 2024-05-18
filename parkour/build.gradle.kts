@@ -3,7 +3,7 @@ plugins {
     `java-library`
 }
 
-group = "dev.cybercoder_nishant"
+group = "io.github.cybercodernaj"
 version = libs.versions.lib.get()
 
 repositories {

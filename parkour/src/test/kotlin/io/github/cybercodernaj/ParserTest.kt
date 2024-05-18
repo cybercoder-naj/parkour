@@ -1,6 +1,6 @@
-package dev.cybercoder_nishant
+package io.github.cybercodernaj
 
-import dev.cybercoder_nishant.parkour.Parser
+import io.github.cybercodernaj.parkour.Parser
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

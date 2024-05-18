@@ -3,7 +3,7 @@ plugins {
     application
 }
 
-group = "dev.cybercoder_nishant"
+group = "io.github.cybercodernaj"
 version = libs.versions.lib.get()
 
 repositories {
@@ -23,5 +23,5 @@ kotlin {
 }
 
 application {
-    mainClass = "dev.cybercoder_nishant.MainKt"
+    mainClass = "io.github.cybercodernaj.MainKt"
 }

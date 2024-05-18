@@ -1,4 +1,4 @@
-package dev.cybercoder_nishant.parkour
+package io.github.cybercodernaj.parkour
 
 /**
  * A parser class.
