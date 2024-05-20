@@ -9,4 +9,4 @@ plugins {
  */
 
 rootProject.name = "Parkour"
-include("sample", "parkour")
+include("sample")

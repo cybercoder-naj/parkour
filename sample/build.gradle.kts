@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":parkour"))
+    implementation(project(":"))
     testImplementation(kotlin("test"))
 }
 

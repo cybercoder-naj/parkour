@@ -1,3 +1,23 @@
 plugins {
-    kotlin("jvm") version "1.9.23" apply false
+    kotlin("jvm") version "1.9.23"
+    alias(libs.plugins.dokka)
+    `java-library`
+}
+
+group = "io.github.cybercodernaj"
+version = libs.versions.lib.get()
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation(kotlin("test"))
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+kotlin {
+    jvmToolchain(18)
 }
