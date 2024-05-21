@@ -22,10 +22,9 @@ class ParkourStateTest {
 
   @Test
   fun initStateWithString() {
-    val state = ParkourState("abc")
+    val state = StringParkourState("abc")
 
     assertEquals(ParkourState.Pos(0, 0), state.pos)
-    assertEquals(ParkourState.SrcType.STRING, state.srcType)
     assertEquals("abc", state.currentLine)
   }
 
@@ -36,10 +35,9 @@ class ParkourStateTest {
     val secondLine = "This is the second line"
     tempFile.writeText("$firstLine\n$secondLine")
 
-    val state = ParkourState(tempFile)
+    val state = FileParkourState(tempFile)
 
     assertEquals(ParkourState.Pos(0, 0), state.pos)
-    assertEquals(ParkourState.SrcType.FILE, state.srcType)
     assertEquals(firstLine, state.currentLine)
 
     state.pos = ParkourState.Pos(1, 0)
