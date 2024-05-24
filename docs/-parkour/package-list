@@ -13,11 +13,5 @@ $dokka.location:io.github.cybercodernaj.parkour.core.lexer/Lexer/singleLineComme
 $dokka.location:io.github.cybercodernaj.parkour.core.lexer/Lexer/skipCharacters/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.core.lexer/-lexer/skip-characters.html
 $dokka.location:io.github.cybercodernaj.parkour.core.lexer/Literals///PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.core.lexer/-literals/index.html
 $dokka.location:io.github.cybercodernaj.parkour.core.lexer/Literals/Literals/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.core.lexer/-literals/-literals.html
-$dokka.location:io.github.cybercodernaj.parkour.core.utils////PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.core.utils/index.html
-$dokka.location:io.github.cybercodernaj.parkour.core.utils/Position///PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.core.utils/-position/index.html
-$dokka.location:io.github.cybercodernaj.parkour.core.utils/Position/Position/#kotlin.Int#kotlin.Int/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.core.utils/-position/-position.html
-$dokka.location:io.github.cybercodernaj.parkour.core.utils/Position/col/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.core.utils/-position/col.html
-$dokka.location:io.github.cybercodernaj.parkour.core.utils/Position/line/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.core.utils/-position/line.html
 io.github.cybercodernaj.parkour.core.lexer
-io.github.cybercodernaj.parkour.core.utils
 
