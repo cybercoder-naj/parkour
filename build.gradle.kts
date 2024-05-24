@@ -1,7 +1,7 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "2.0.0"
     alias(libs.plugins.dokka)
     `java-library`
 }

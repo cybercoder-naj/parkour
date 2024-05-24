@@ -1,4 +1,4 @@
-package io.github.cybercodernaj.parkour.core
+package io.github.cybercodernaj.parkour.core.state
 
 import java.io.BufferedReader
 import java.io.File

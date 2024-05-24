@@ -1,4 +1,4 @@
-package io.github.cybercodernaj.parkour.core
+package io.github.cybercodernaj.parkour.core.state
 
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*

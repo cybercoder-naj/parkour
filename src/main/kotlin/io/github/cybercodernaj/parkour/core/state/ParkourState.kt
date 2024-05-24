@@ -1,4 +1,4 @@
-package io.github.cybercodernaj.parkour.core
+package io.github.cybercodernaj.parkour.core.state
 
 /**
  * The [ParkourState] maintains the state of the parsing state.
