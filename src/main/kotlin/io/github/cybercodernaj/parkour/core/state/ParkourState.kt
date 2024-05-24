@@ -2,6 +2,7 @@ package io.github.cybercodernaj.parkour.core.state
 
 import io.github.cybercodernaj.parkour.core.lexer.Lexer
 import io.github.cybercodernaj.parkour.core.lexer.Token
+import io.github.cybercodernaj.parkour.core.utils.Position
 
 /**
  * The [ParkourState] maintains the state of the parsing state.
@@ -12,14 +13,14 @@ import io.github.cybercodernaj.parkour.core.lexer.Token
 internal abstract class ParkourState(
   private val lexer: Lexer
 ) {
-  var pos: Pos = Pos(0, 0)
+  var pos: Position = Position(0, 0)
     private set(value) {
       if (value.line > field.line)
         updateCurrentLine()
       field = value
     }
 
-  lateinit var currentLine: String
+  var currentLine: String? = null
     private set
 
   /**
@@ -47,24 +48,15 @@ internal abstract class ParkourState(
   /**
    * Update the current line by making a call to [nextLine].
    * Also updates [inputTokens] in synchronisation.
+   * When this function is invoked, it is assumed that [pos] is already updated
+   * to the new position.
    *
    * @author Nishant Aanjaney Jalan
    * @since 0.0.1
    */
   private fun updateCurrentLine() {
-    currentLine = nextLine() ?: TODO("match(Token.EOF)")
-    inputTokens = lexer.tokenize(currentLine)
-  }
+    currentLine = nextLine()
 
-  /**
-   * Similar to a [Pair] class of two integers.
-   * Holds the line and column number in the contents defined by the strategies.
-   *
-   * @author Nishant Aanjaney Jalan
-   * @since 0.0.1
-   */
-  data class Pos(
-    val line: Int,
-    val col: Int
-  )
+    inputTokens = currentLine?.let { lexer.tokenize(it, pos.line) } ?: listOf(Token.EOF)
+  }
 }
