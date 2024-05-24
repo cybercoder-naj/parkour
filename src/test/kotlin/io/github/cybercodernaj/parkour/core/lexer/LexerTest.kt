@@ -1,15 +1,15 @@
 package io.github.cybercodernaj.parkour.core.lexer
 
 import org.junit.jupiter.api.Test
-import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
 
 class LexerTest {
   private val lexer = Lexer()
 
   @Test
   fun `empty string returns singleton list with EOF`() {
-    val tokens = lexer.tokenize("", 0)
+    val token = lexer.nextToken()
 
-    assertContentEquals(listOf(Token.EOF), tokens)
+    assertEquals(Token.EOF, token)
   }
 }

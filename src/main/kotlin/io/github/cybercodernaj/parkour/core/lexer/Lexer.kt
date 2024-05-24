@@ -1,5 +1,8 @@
 package io.github.cybercodernaj.parkour.core.lexer
 
+import io.github.cybercodernaj.parkour.core.datasource.TextSource
+import io.github.cybercodernaj.parkour.core.utils.Position
+
 /**
  * The lexer is responsible to convert the given string into a stream of [Token]s.
  * The lexer take in multiple settings that configure how it behaves.
@@ -67,19 +70,18 @@ class Lexer(
    */
   val literals: Literals = Literals()
 ) {
+  internal var position = Position(0, 0)
+    private set
+
+  internal lateinit var source: TextSource
+
   /**
-   * Performs lexical analysis on the string and returns a list of tokens.
+   * Fetches the next [Token] from the source
    *
-   * @param contents the string to analyze.
-   * @param line the line number of the content to fill the start and ending positions
-   *    of each token.
-   * @see Token
    * @author Nishant Aanjaney Jalan
    * @since 0.0.1
    */
-  internal fun tokenize(contents: String, line: Int): List<Token> {
-    val tokens = mutableListOf<Token>()
-
-    return tokens + Token.EOF
+  internal fun nextToken(): Token {
+    return Token.EOF
   }
 }
