@@ -1,18 +1,25 @@
 package io.github.cybercodernaj.parkour.core.state
 
+import io.github.cybercodernaj.parkour.core.lexer.Lexer
 import java.io.BufferedReader
 import java.io.File
 
+/**
+ * Parses a file by reading from it line by line.
+ *
+ * @author Nishant Aanjaney Jalan
+ * @since 0.0.1
+ */
 internal class FileParkourState(
+  lexer: Lexer,
   file: File
-): ParkourState() {
-  private val bufferedReader: BufferedReader = BufferedReader(file.reader())
+) : ParkourState(lexer) {
+  private val bufferedReader: BufferedReader = file.bufferedReader()
 
-  override var pos: Pos = Pos(0, 0)
-    set(value) {
-      if (value.line > field.line)
-        currentLine = bufferedReader.readLine()
-      field = value
-    }
-  override var currentLine: String? = bufferedReader.readLine()
+  init {
+    initialize()
+  }
+
+  override fun nextLine(): String? =
+    bufferedReader.readLine()
 }

@@ -1,5 +1,6 @@
 package io.github.cybercodernaj.parkour.core.state
 
+import io.github.cybercodernaj.parkour.core.lexer.Lexer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -9,6 +10,7 @@ import java.io.File
 class ParkourStateTest {
 
   private lateinit var tempFile: File
+  private val lexer = Lexer()
 
   @BeforeEach
   fun setup() {
@@ -22,7 +24,7 @@ class ParkourStateTest {
 
   @Test
   fun initStateWithString() {
-    val state = StringParkourState("abc")
+    val state = StringParkourState(lexer, "abc")
 
     assertEquals(ParkourState.Pos(0, 0), state.pos)
     assertEquals("abc", state.currentLine)
@@ -35,12 +37,9 @@ class ParkourStateTest {
     val secondLine = "This is the second line"
     tempFile.writeText("$firstLine\n$secondLine")
 
-    val state = FileParkourState(tempFile)
+    val state = FileParkourState(lexer, tempFile)
 
     assertEquals(ParkourState.Pos(0, 0), state.pos)
     assertEquals(firstLine, state.currentLine)
-
-    state.pos = ParkourState.Pos(1, 0)
-    assertEquals(secondLine, state.currentLine)
   }
 }
