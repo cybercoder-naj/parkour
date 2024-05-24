@@ -7,7 +7,7 @@ package io.github.cybercodernaj.parkour.core.utils
  * @author Nishant Aanjaney Jalan
  * @since 0.0.1
  */
-data class Position(
+internal data class Position(
   val line: Int,
   val col: Int
 )
