@@ -1,7 +1,5 @@
-import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import java.net.URI
-import java.net.URL
 
 plugins {
   kotlin("jvm") version "2.0.0"

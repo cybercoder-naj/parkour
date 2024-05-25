@@ -1,4 +1,4 @@
-package io.github.cybercodernaj.parkour.core.utils
+package io.github.cybercodernaj.parkour.utils
 
 /**
  * Similar to a [Pair] class of two integers.

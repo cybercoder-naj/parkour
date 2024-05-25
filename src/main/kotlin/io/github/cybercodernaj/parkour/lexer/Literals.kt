@@ -1,4 +1,4 @@
-package io.github.cybercodernaj.parkour.core.lexer
+package io.github.cybercodernaj.parkour.lexer
 
 /**
  *

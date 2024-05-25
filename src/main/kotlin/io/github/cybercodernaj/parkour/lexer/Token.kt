@@ -1,6 +1,6 @@
-package io.github.cybercodernaj.parkour.core.lexer
+package io.github.cybercodernaj.parkour.lexer
 
-import io.github.cybercodernaj.parkour.core.utils.Position
+import io.github.cybercodernaj.parkour.utils.Position
 
 /**
  * A token is a single identifiable unit in a string.

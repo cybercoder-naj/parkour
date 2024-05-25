@@ -1,4 +1,4 @@
-package io.github.cybercodernaj.parkour.core.datasource
+package io.github.cybercodernaj.parkour.datasource
 
 internal interface TextSource {
   /**

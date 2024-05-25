@@ -1,7 +1,7 @@
-package io.github.cybercodernaj.parkour.core.lexer
+package io.github.cybercodernaj.parkour.lexer
 
-import io.github.cybercodernaj.parkour.core.datasource.TextSource
-import io.github.cybercodernaj.parkour.core.utils.Position
+import io.github.cybercodernaj.parkour.datasource.TextSource
+import io.github.cybercodernaj.parkour.utils.Position
 
 /**
  * The lexer is responsible to convert the given string into a stream of [Token]s.

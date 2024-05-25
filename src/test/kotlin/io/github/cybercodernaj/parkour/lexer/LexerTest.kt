@@ -1,6 +1,6 @@
-package io.github.cybercodernaj.parkour.core.lexer
+package io.github.cybercodernaj.parkour.lexer
 
-import io.github.cybercodernaj.parkour.core.datasource.StringSource
+import io.github.cybercodernaj.parkour.datasource.StringSource
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import kotlin.test.assertEquals
