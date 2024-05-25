@@ -12,5 +12,6 @@ internal sealed class Token(
   val start: Position?,
   val end: Position?
 ) {
+  class Identifier(val name: String, start: Position, end: Position) : Token(start, end)
   data object EOF : Token(null, null)
 }

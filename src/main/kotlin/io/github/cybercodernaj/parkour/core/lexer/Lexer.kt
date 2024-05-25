@@ -17,7 +17,7 @@ class Lexer(
    * @author Nishant Aanjaney Jalan
    * @since 0.0.1
    */
-  val skipCharacters: Regex = Regex("\\s"),
+  val skipCharacters: Regex = Regex("""\s"""),
   /**
    * The string that defines how a single-line comment starts.
    * Once identified, the lexer will skip the entire line. (Default: null)
@@ -40,7 +40,7 @@ class Lexer(
    * @author Nishant Aanjaney Jalan
    * @since 0.0.1
    */
-  val identifiers: Regex = Regex("[a-zA-Z_]\\w*"),
+  val identifiers: Regex = Regex("""[a-zA-Z_]\w*"""),
   /**
    * A list of strings that are considered as keywords. (Default: [])
    *
@@ -75,6 +75,10 @@ class Lexer(
 
   internal lateinit var source: TextSource
 
+  private var _currentLine: String? = null
+  private val currentLine: String
+    get() = _currentLine!!
+
   /**
    * Fetches the next [Token] from the source
    *
@@ -82,6 +86,48 @@ class Lexer(
    * @since 0.0.1
    */
   internal fun nextToken(): Token {
-    return Token.EOF
+    validateCurrentLine()
+    if (_currentLine == null)
+      return Token.EOF
+
+    if (currentLine.isBlank()) {
+      position = position + currentLine.length
+      return nextToken()
+    }
+
+    val start = position
+    var buffer = StringBuilder()
+    while (position.col < currentLine.length && !skipCharacters.matches(currentLine[position.col].toString())) {
+      buffer.append(currentLine[position.col])
+      position++
+    }
+    val end = position
+
+    return classifyToken(buffer.toString(), start, end)
+  }
+
+  private fun validateCurrentLine() {
+    if (_currentLine == null) {
+      updateCurrentLine()
+    } else if (position.col >= currentLine.length) {
+      position = position.nextLine()
+      updateCurrentLine()
+    }
+  }
+
+  private fun updateCurrentLine() {
+    _currentLine = source.fetchLine(position.line)
+  }
+
+  private fun classifyToken(
+    string: String,
+    start: Position,
+    end: Position
+  ): Token {
+    if (identifiers.matches(string)) {
+      return Token.Identifier(string, start, end)
+    }
+    // TODO replace this with a custom exception
+    throw Exception("Lexical error: Cannot classify the token: $string")
   }
 }

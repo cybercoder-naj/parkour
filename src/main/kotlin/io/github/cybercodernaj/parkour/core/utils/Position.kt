@@ -10,4 +10,18 @@ package io.github.cybercodernaj.parkour.core.utils
 internal data class Position(
   val line: Int,
   val col: Int
-)
+) {
+  fun nextLine(): Position {
+    return Position(line + 1, 0)
+  }
+
+  operator fun plus(other: Position): Position {
+    return Position(this.line + other.line, this.col + other.col)
+  }
+
+  operator fun plus(colOffset: Int): Position =
+    Position(line, col + colOffset)
+
+  operator fun inc(): Position =
+    plus(1)
+}

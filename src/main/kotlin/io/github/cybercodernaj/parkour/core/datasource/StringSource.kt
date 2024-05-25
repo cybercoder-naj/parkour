@@ -1,6 +1,6 @@
 package io.github.cybercodernaj.parkour.core.datasource
 
-class StringSource(
+internal class StringSource(
   contents: String
 ) : TextSource {
   private val lines = contents.lines()
