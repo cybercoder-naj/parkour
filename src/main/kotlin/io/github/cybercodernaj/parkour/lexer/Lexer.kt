@@ -9,7 +9,8 @@ import io.github.cybercodernaj.parkour.utils.Position
  * It will perform lexical analysis on a line-by-line basis and return the next unconsumed token.
  *
  * @constructor Creates a lexer with the provided properties.
- * @property tokenSeparator The regex to split a given line to the lexer. (Default: "\s")
+ * @property tokenSeparator The regex to split a given line to the lexer.
+ *    Newline characters are **always** token separators. (Default: "\s")
  * @property singleLineComments The string that defines how a single-line comment starts.
  *    Once identified, the lexer will skip the entire line. (Default: null)
  * @property multilineComments A pair of strings, the starting pattern and the ending pattern for a
@@ -34,13 +35,22 @@ class Lexer(
   private val literals: Literals = Literals()
 ) {
   internal var position = Position(0, 0)
-    private set
+    private set(value) {
+      if (value.shouldAdvanceLine()) {
+        tokenInvalidation = true
+      }
+      field = value
+    }
 
   internal lateinit var source: TextSource
 
   private var _currentLine: String? = null
   private val currentLine: String
     get() = _currentLine!!
+
+  private var tokenIndex = 0
+  private var tokenStream = emptyList<Token>()
+  private var tokenInvalidation = true
 
   /**
    * Fetches the next [Token] from the source
@@ -49,37 +59,55 @@ class Lexer(
    * @since 0.0.1
    */
   internal fun nextToken(): Token {
-    validateCurrentLine()
-    if (_currentLine == null)
-      return Token.EOF
+    if (tokenInvalidation)
+      updateTokenStream()
 
-    if (currentLine.isBlank()) {
-      position += currentLine.length
+    if (tokenStream.isEmpty()) {
+      position = position.nextLine()
       return nextToken()
     }
 
-    val start = position
-    val buffer = StringBuilder()
-    while (position.col < currentLine.length && !tokenSeparator.matches(currentLine[position.col].toString())) {
-      buffer.append(currentLine[position.col])
-      position++
-    }
-    val end = position
-
-    return classifyToken(buffer.toString(), start, end)
+    return tokenStream[tokenIndex++]
   }
 
-  private fun validateCurrentLine() {
-    if (_currentLine == null) {
-      updateCurrentLine()
-    } else if (position.col >= currentLine.length) {
-      position = position.nextLine()
-      updateCurrentLine()
-    }
-  }
-
-  private fun updateCurrentLine() {
+  private fun updateTokenStream() {
     _currentLine = source.fetchLine(position.line)
+    tokenIndex = 0 // reset the counter
+
+    if (_currentLine == null) {
+      tokenStream = listOf(Token.EOF)
+      return
+    }
+
+    val tokenStream = mutableListOf<Token>()
+    while (position.col < currentLine.length) {
+      val start = position
+
+      val match = tokenSeparator.find(currentLine, startIndex = start.col)
+      val end = if (match == null) { // capture the remaining string
+        start.copy(col = currentLine.length)
+      } else {
+        start.copy(col = match.range.last)
+      }
+
+      if (start == end) {
+        // position points to a tokenSeparator
+        // increment position and try again.
+        position++
+        continue
+      }
+
+      tokenStream.addToken(start, end)
+      position = end
+    }
+
+    adjustPositionIfNeeded()
+    this.tokenStream = tokenStream
+  }
+
+  private fun adjustPositionIfNeeded() {
+    if (position.shouldAdvanceLine())
+      position = position.nextLine()
   }
 
   private fun classifyToken(
@@ -93,4 +121,17 @@ class Lexer(
     // TODO replace this with a custom exception
     throw Exception("Lexical error: Cannot classify the token: $string")
   }
+
+  private fun MutableList<Token>.addToken(
+    start: Position,
+    end: Position
+  ) {
+    val tokenStr = currentLine.substring(start.col, end.col)
+    this.add(classifyToken(tokenStr, start, end))
+  }
+
+  private fun Position.shouldAdvanceLine(): Boolean {
+    return this.col >= currentLine.length
+  }
 }
+
