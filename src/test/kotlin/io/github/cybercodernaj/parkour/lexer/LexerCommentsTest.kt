@@ -20,6 +20,21 @@ class LexerCommentsTest {
   }
 
   @Test
+  fun `returns an identifier without a space`() {
+    lexer.source = StringSource("age// Should still consider an identifier")
+
+    val token = lexer.nextToken()
+    assertEquals(
+      Token.Identifier(
+        name = "age",
+        start = Position(0, 0),
+        end = Position(0, 2)
+      ),
+      token
+    )
+  }
+
+  @Test
   fun `returns 2 identifiers ignoring single line comment`() {
     lexer.source = StringSource("age // This is age\nhello")
 

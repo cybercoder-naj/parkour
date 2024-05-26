@@ -34,7 +34,7 @@ class Lexer(
   private val separators: List<String> = emptyList(),
   private val literals: Literals = Literals()
 ) {
-  internal var position = Position(0, 0)
+  private var position = Position(0, 0)
     private set(value) {
       if (value.shouldAdvanceLine()) {
         tokenInvalidation = true
@@ -51,6 +51,12 @@ class Lexer(
   private var tokenIndex = 0
   private var tokenStream = emptyList<Token>()
   private var tokenInvalidation = true
+
+  private val combinedTokenSeparator: Regex
+
+  init {
+    combinedTokenSeparator = buildDisjunctRegex()
+  }
 
   /**
    * Fetches the next [Token] from the source
@@ -84,11 +90,11 @@ class Lexer(
       skipOverComments()
       val start = position
 
-      val match = tokenSeparator.find(currentLine, startIndex = start.col)
+      val match = combinedTokenSeparator.find(currentLine, startIndex = start.col)
       val end = if (match == null) { // capture the remaining string
         start.copy(col = currentLine.length - 1)
       } else {
-        start.copy(col = match.range.last - 1)
+        start.copy(col = match.range.first - 1)
       }
 
       if (start >= end) {
@@ -122,15 +128,36 @@ class Lexer(
   }
 
   private fun classifyToken(
-    string: String,
+    tokenStr: String,
     start: Position,
     end: Position
   ): Token {
-    if (identifiers.matches(string)) {
-      return Token.Identifier(string, start, end)
+    if (identifiers.matches(tokenStr)) {
+      return Token.Identifier(tokenStr, start, end)
     }
     // TODO replace this with a custom exception
-    throw Exception("Lexical error: Cannot classify the token: $string")
+    throw Exception("Lexical error: Cannot classify the token: $tokenStr")
+  }
+
+  private fun buildDisjunctRegex(): Regex {
+    val patterns = mutableSetOf(tokenSeparator.pattern).apply {
+      addAll(operators)
+      addAll(separators)
+    }
+
+    singleLineComments?.let { patterns.add(it) }
+    multilineComments?.let { (start, end) ->
+      patterns.add(start)
+      patterns.add(end)
+    }
+
+    // TODO the mapping to escape regex shorthands is ugly.
+    //    Maybe find a better solution.
+    patterns.map {
+      it.replace("*", "\\*")
+    }.also {
+      return Regex(it.joinToString("|"))
+    }
   }
 
   private fun MutableList<Token>.addToken(
