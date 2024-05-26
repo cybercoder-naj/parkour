@@ -28,4 +28,8 @@ internal data class Position(
   operator fun rangeTo(end: Position): IntRange {
     return this.col..end.col
   }
+
+  operator fun compareTo(end: Position): Int {
+    return this.col compareTo end.col
+  }
 }

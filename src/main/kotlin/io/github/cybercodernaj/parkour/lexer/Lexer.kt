@@ -12,7 +12,7 @@ import io.github.cybercodernaj.parkour.utils.Position
  * @property tokenSeparator The regex to split a given line to the lexer.
  *    Newline characters are **always** token separators. (Default: "\s")
  * @property singleLineComments The string that defines how a single-line comment starts.
- *    Once identified, the lexer will skip the entire line. (Default: null)
+ *    Once identified, the lexer will skip the remaining line. (Default: null)
  * @property multilineComments A pair of strings, the starting pattern and the ending pattern for a
  *    multiline comment block. (Default: null)
  * @property identifiers A regex string that defines the rules for identifying a name. (Default: "[a-zA-Z_]\w*")
@@ -81,18 +81,20 @@ class Lexer(
 
     val tokenStream = mutableListOf<Token>()
     while (position.col < currentLine.length) {
+      skipOverComments()
       val start = position
 
       val match = tokenSeparator.find(currentLine, startIndex = start.col)
       val end = if (match == null) { // capture the remaining string
         start.copy(col = currentLine.length - 1)
       } else {
-        start.copy(col = match.range.last)
+        start.copy(col = match.range.last - 1)
       }
 
-      if (start == end) {
-        // position points to a tokenSeparator
-        // increment position and try again.
+      if (start >= end) {
+        // when start points to the end of the line which means match results in null.
+        // OR
+        // position points to a tokenSeparator; increment position and try again.
         position++
         continue
       }
@@ -103,6 +105,15 @@ class Lexer(
 
     adjustPositionIfNeeded()
     this.tokenStream = tokenStream
+  }
+
+  private fun skipOverComments() {
+    if (singleLineComments != null) {
+      if (currentLine.substring(position.col).startsWith(singleLineComments)) {
+        // point position to outside the line
+        position = position.copy(col = currentLine.length)
+      }
+    }
   }
 
   private fun adjustPositionIfNeeded() {

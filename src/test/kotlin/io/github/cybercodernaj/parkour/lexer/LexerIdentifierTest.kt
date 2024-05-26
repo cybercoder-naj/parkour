@@ -7,34 +7,37 @@ import org.junit.jupiter.api.fail
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class LexerTest {
+class LexerIdentifierTest {
   private val lexer = Lexer()
 
   @Test
   fun `returns EOF on empty source`() {
     lexer.source = StringSource("")
-    val token = lexer.nextToken()
 
+    val token = lexer.nextToken()
     assertEquals(Token.EOF, token)
   }
 
   @Test
   fun `returns an identifier`() {
     lexer.source = StringSource("name")
-    val token = lexer.nextToken()
 
-    assertTrue(token is Token.Identifier, "The token is not an identifier")
-    assertEquals("name", token.name)
-    assertEquals(Position(0, 0), token.start)
-    assertEquals(Position(0, 3), token.end)
+    val token = lexer.nextToken()
+    assertEquals(
+      Token.Identifier(
+        name = "name",
+        start = Position(0, 0),
+        end = Position(0, 3)
+      ),
+      token
+    )
   }
 
   @Test
   fun `first returns an identifier, then EOF`() {
     lexer.source = StringSource("name\n  \n  ")
-    val token = lexer.nextToken()
 
-    assertTrue(token is Token.Identifier, "The token is not an identifier")
+    val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
         name = "name",
@@ -45,7 +48,6 @@ class LexerTest {
     )
 
     val token2 = lexer.nextToken()
-
     assertEquals(Token.EOF, token2)
   }
 
@@ -62,9 +64,8 @@ class LexerTest {
   @Test
   fun `returns 3 identifiers`() {
     lexer.source = StringSource("name\n  name2\n\t\tname3")
-    val token = lexer.nextToken()
 
-    assertTrue(token is Token.Identifier, "The token is not an identifier")
+    val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
         name = "name",
@@ -75,7 +76,6 @@ class LexerTest {
     )
 
     val token2 = lexer.nextToken()
-    assertTrue(token2 is Token.Identifier, "The token is not an identifier")
     assertEquals(
       Token.Identifier(
         name = "name2",
@@ -86,7 +86,6 @@ class LexerTest {
     )
 
     val token3 = lexer.nextToken()
-    assertTrue(token3 is Token.Identifier, "The token is not an identifier")
     assertEquals(
       Token.Identifier(
         name = "name3",
