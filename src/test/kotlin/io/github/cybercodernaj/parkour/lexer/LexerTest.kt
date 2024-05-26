@@ -45,7 +45,7 @@ class LexerTest {
     try {
       val token = lexer.nextToken()
       fail("The token should not have been returned")
-    } catch (ex: Exception) {
+    } catch (_: Exception) {
     }
   }
 }

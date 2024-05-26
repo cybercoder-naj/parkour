@@ -12,12 +12,12 @@ import io.github.cybercodernaj.parkour.utils.Position
  */
 class Lexer(
   /**
-   * The characters the lexer should not consider. (Default: "\s")
+   * The regex to split a given line to the lexer. (Default: "\s")
    *
    * @author Nishant Aanjaney Jalan
    * @since 0.0.1
    */
-  val skipCharacters: Regex = Regex("""\s"""),
+  val tokenSeparator: Regex = Regex("""\s"""),
   /**
    * The string that defines how a single-line comment starts.
    * Once identified, the lexer will skip the entire line. (Default: null)
@@ -47,21 +47,21 @@ class Lexer(
    * @author Nishant Aanjaney Jalan
    * @since 0.0.1
    */
-  val keywords: List<String> = emptyList<String>(),
+  val keywords: List<String> = emptyList(),
   /**
    * A list of strings that are considered as operators. (Default: [])
    *
    * @author Nishant Aanjaney Jalan
    * @since 0.0.1
    */
-  val operators: List<String> = emptyList<String>(),
+  val operators: List<String> = emptyList(),
   /**
    * A list of strings that are considered as separators. (Default: [])
    *
    * @author Nishant Aanjaney Jalan
    * @since 0.0.1
    */
-  val separators: List<String> = emptyList<String>(),
+  val separators: List<String> = emptyList(),
   /**
    * A configuration of the literals to be considered. (Default: see [Literals])
    *
@@ -91,13 +91,13 @@ class Lexer(
       return Token.EOF
 
     if (currentLine.isBlank()) {
-      position = position + currentLine.length
+      position += currentLine.length
       return nextToken()
     }
 
     val start = position
-    var buffer = StringBuilder()
-    while (position.col < currentLine.length && !skipCharacters.matches(currentLine[position.col].toString())) {
+    val buffer = StringBuilder()
+    while (position.col < currentLine.length && !tokenSeparator.matches(currentLine[position.col].toString())) {
       buffer.append(currentLine[position.col])
       position++
     }
