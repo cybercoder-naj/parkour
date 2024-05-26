@@ -8,10 +8,7 @@ import io.github.cybercodernaj.parkour.utils.Position
  * @author Nishant Aanjaney Jalan
  * @since 0.0.1
  */
-internal sealed class Token(
-  val start: Position?,
-  val end: Position?
-) {
-  class Identifier(val name: String, start: Position, end: Position) : Token(start, end)
-  data object EOF : Token(null, null)
+internal sealed class Token {
+  data class Identifier(val name: String, val start: Position, val end: Position) : Token()
+  data object EOF : Token()
 }

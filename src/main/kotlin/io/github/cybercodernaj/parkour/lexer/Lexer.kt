@@ -85,7 +85,7 @@ class Lexer(
 
       val match = tokenSeparator.find(currentLine, startIndex = start.col)
       val end = if (match == null) { // capture the remaining string
-        start.copy(col = currentLine.length)
+        start.copy(col = currentLine.length - 1)
       } else {
         start.copy(col = match.range.last)
       }
@@ -126,7 +126,7 @@ class Lexer(
     start: Position,
     end: Position
   ) {
-    val tokenStr = currentLine.substring(start.col, end.col)
+    val tokenStr = currentLine.substring(start..end)
     this.add(classifyToken(tokenStr, start, end))
   }
 

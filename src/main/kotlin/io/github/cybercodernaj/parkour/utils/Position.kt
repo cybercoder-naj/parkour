@@ -24,4 +24,8 @@ internal data class Position(
 
   operator fun inc(): Position =
     plus(1)
+
+  operator fun rangeTo(end: Position): IntRange {
+    return this.col..end.col
+  }
 }
