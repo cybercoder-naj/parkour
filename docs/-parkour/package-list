@@ -3,14 +3,6 @@ $dokka.linkExtension:html
 $dokka.location:io.github.cybercodernaj.parkour.lexer////PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/index.html
 $dokka.location:io.github.cybercodernaj.parkour.lexer/Lexer///PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-lexer/index.html
 $dokka.location:io.github.cybercodernaj.parkour.lexer/Lexer/Lexer/#kotlin.text.Regex#kotlin.String?#kotlin.Pair[kotlin.String,kotlin.String]?#kotlin.text.Regex#kotlin.collections.List[kotlin.String]#kotlin.collections.List[kotlin.String]#kotlin.collections.List[kotlin.String]#io.github.cybercodernaj.parkour.lexer.Literals/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-lexer/-lexer.html
-$dokka.location:io.github.cybercodernaj.parkour.lexer/Lexer/identifiers/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-lexer/identifiers.html
-$dokka.location:io.github.cybercodernaj.parkour.lexer/Lexer/keywords/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-lexer/keywords.html
-$dokka.location:io.github.cybercodernaj.parkour.lexer/Lexer/literals/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-lexer/literals.html
-$dokka.location:io.github.cybercodernaj.parkour.lexer/Lexer/multilineComments/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-lexer/multiline-comments.html
-$dokka.location:io.github.cybercodernaj.parkour.lexer/Lexer/operators/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-lexer/operators.html
-$dokka.location:io.github.cybercodernaj.parkour.lexer/Lexer/separators/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-lexer/separators.html
-$dokka.location:io.github.cybercodernaj.parkour.lexer/Lexer/singleLineComments/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-lexer/single-line-comments.html
-$dokka.location:io.github.cybercodernaj.parkour.lexer/Lexer/skipCharacters/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-lexer/skip-characters.html
 $dokka.location:io.github.cybercodernaj.parkour.lexer/Literals///PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-literals/index.html
 $dokka.location:io.github.cybercodernaj.parkour.lexer/Literals/Literals/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour.lexer/-literals/-literals.html
 io.github.cybercodernaj.parkour.lexer
