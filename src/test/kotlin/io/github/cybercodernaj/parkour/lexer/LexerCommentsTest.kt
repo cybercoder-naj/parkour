@@ -58,4 +58,62 @@ class LexerCommentsTest {
       token2
     )
   }
+
+  @Test
+  fun `returns 2 identifiers ignoring multi-line comment`() {
+    lexer.source = StringSource("age /* This is age */\nhello")
+
+    val token = lexer.nextToken()
+    assertEquals(
+      Token.Identifier(
+        name = "age",
+        start = Position(0, 0),
+        end = Position(0, 2)
+      ),
+      token
+    )
+
+    val token2 = lexer.nextToken()
+    assertEquals(
+      Token.Identifier(
+        name = "hello",
+        start = Position(1, 0),
+        end = Position(1, 4)
+      ),
+      token2
+    )
+  }
+
+  @Test
+  fun `returns 2 identifiers ignoring multi-line comment across lines`() {
+    val content = """age
+      |/* This is
+      | * is new
+      | * multiline
+      | * comment
+      | */
+      |hello
+    """.trimMargin()
+    lexer.source = StringSource(content)
+
+    val token = lexer.nextToken()
+    assertEquals(
+      Token.Identifier(
+        name = "age",
+        start = Position(0, 0),
+        end = Position(0, 2)
+      ),
+      token
+    )
+
+    val token2 = lexer.nextToken()
+    assertEquals(
+      Token.Identifier(
+        name = "hello",
+        start = Position(6, 0),
+        end = Position(6, 4)
+      ),
+      token2
+    )
+  }
 }

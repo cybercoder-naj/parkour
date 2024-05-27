@@ -69,7 +69,7 @@ class Lexer(
       updateTokenStream()
 
     if (tokenStream.isEmpty()) {
-      position = position.nextLine()
+      adjustPositionIfNeeded()
       return nextToken()
     }
 
@@ -77,7 +77,7 @@ class Lexer(
   }
 
   private fun updateTokenStream() {
-    _currentLine = source.fetchLine(position.line)
+    fetchNextLine()
     tokenIndex = 0 // reset the counter
 
     if (_currentLine == null) {
@@ -109,8 +109,11 @@ class Lexer(
       position = end
     }
 
-    adjustPositionIfNeeded()
     this.tokenStream = tokenStream
+  }
+
+  private fun fetchNextLine() {
+    _currentLine = source.fetchLine(position.line)
   }
 
   private fun skipOverComments() {
@@ -118,6 +121,23 @@ class Lexer(
       if (currentLine.substring(position.col).startsWith(singleLineComments)) {
         // point position to outside the line
         position = position.copy(col = currentLine.length)
+      }
+    }
+
+    if (multilineComments != null) {
+      val (start, end) = multilineComments
+      if (currentLine.substring(position.col).startsWith(start)) {
+        while (true) {
+          val to = currentLine.indexOf(end, startIndex = position.col)
+          if (to == -1) {
+            position = position.nextLine()
+            fetchNextLine()
+            continue
+          }
+
+          position = position.copy(col = to + end.length)
+          break
+        }
       }
     }
   }
