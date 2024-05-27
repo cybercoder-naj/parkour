@@ -60,6 +60,8 @@ class Lexer(
 
   private val combinedTokenSeparator: Regex
 
+  private var insideMultilineComment = false
+
   init {
     combinedTokenSeparator = buildDisjunctRegex()
   }
@@ -134,25 +136,24 @@ class Lexer(
 
     multilineComments
       ?.let { (start, end) ->
-        start
-          .find(currentLine) // find the start regex
-          ?.let inner@{ startMatch ->
-            if (startMatch.range.first != position.col) // assert start symbol is at the position
+        if (!insideMultilineComment) {
+          start.find(currentLine)?.let inner@{ match ->
+            if (match.range.first != position.col)
               return@inner
 
-            while (true) {
-              val endMatch = end.find(currentLine, startIndex = position.col)
-              if (endMatch == null) { // if failed, move to next line and try again
-                position = position.nextLine()
-                fetchNextLine()
-                continue
-              }
-
-              // When found, move position to after the end of comment symbol
-              position = position.copy(col = endMatch.range.last + 1)
-              break
-            }
+            insideMultilineComment = true
           }
+        }
+
+        if (insideMultilineComment) {
+          val match = end.find(currentLine, startIndex = position.col)
+          if (match == null) {
+            position = position.copy(col = currentLine.length)
+          } else {
+            position = position.copy(col = match.range.last + 1)
+            insideMultilineComment = false
+          }
+        }
       }
   }
 
