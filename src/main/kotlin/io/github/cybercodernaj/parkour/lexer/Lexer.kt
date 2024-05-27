@@ -41,7 +41,7 @@ class Lexer(
   private var position = Position(0, 0)
     private set(value) {
       if (value.shouldAdvanceLine()) {
-        tokenInvalidation = true
+        areTokensInvalid = true
       }
       // TODO if position moves to new line, then automatically fetch the next line.
       //    Also removes the need for tokenInvalidation (maybe).
@@ -57,7 +57,7 @@ class Lexer(
 
   private var tokenIndex = 0
   private var tokenStream = emptyList<Token>()
-  private var tokenInvalidation = true
+  private var areTokensInvalid = true
 
   private val combinedTokenSeparator: Regex
 
@@ -74,7 +74,7 @@ class Lexer(
    * @since 0.0.1
    */
   internal fun nextToken(): Token {
-    if (tokenInvalidation)
+    if (areTokensInvalid)
       updateTokenStream()
 
     if (tokenStream.isEmpty()) {
@@ -139,7 +139,7 @@ class Lexer(
       ?.let { (start, end) ->
         if (!insideMultilineComment) {
           start.find(currentLine)?.let inner@{ match ->
-            if (match.range.first != position.col)
+            if (match.range.first != position.col) // valid only if position points to the start of the comment
               return@inner
 
             insideMultilineComment = true
@@ -171,7 +171,7 @@ class Lexer(
     if (identifiers.matches(tokenStr)) {
       return Token.Identifier(tokenStr, start, end)
     }
-    throw LexicalException("Lexical error: Cannot classify the token: $tokenStr")
+    throw LexicalException("Cannot classify the token: $tokenStr")
   }
 
   private fun buildDisjunctRegex(): Regex {
