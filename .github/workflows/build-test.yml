@@ -17,6 +17,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Build code
-        run: ./gradlew build
+        run: ./gradlew :build
       - name: Test code
-        run: ./gradlew test
+        run: ./gradlew :test
