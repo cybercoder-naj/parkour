@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test
 
 class LexerCommentsTest {
   private val lexer = Lexer(
-    singleLineComments = "//",
-    multilineComments = "/*" to "*/"
+    singleLineComments = Regex("//"),
+    multilineComments = Regex("/\\*") to Regex("\\*/")
   )
 
   @Test

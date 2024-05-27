@@ -7,10 +7,9 @@ import io.github.cybercodernaj.parkour.utils.Position
  * The lexer is responsible to convert the given string into a stream of [Token]s.
  * The lexer take in multiple settings that configure how it behaves.
  * It will perform lexical analysis on a line-by-line basis and return the next unconsumed token.
+ * Tokens are separated by the Regex, "\s".
  *
  * @constructor Creates a lexer with the provided properties.
- * @param tokenSeparator The regex to split a given line to the lexer.
- *    Newline characters are **always** token separators. (Default: "\s")
  * @param singleLineComments The string that defines how a single-line comment starts.
  *    Once identified, the lexer will skip the remaining line. (Default: null)
  * @param multilineComments A pair of strings, the starting pattern and the ending pattern for a
@@ -25,13 +24,17 @@ import io.github.cybercodernaj.parkour.utils.Position
  * @since 0.0.1
  */
 class Lexer(
-  private val tokenSeparator: Regex = Regex("""\s"""),
-  private val singleLineComments: String? = null,
-  private val multilineComments: Pair<String, String>? = null,
+  /*
+   * @param tokenSeparator The regex to split a given line to the lexer.
+   *    Newline characters are **always** token separators. (Default: "\s")
+   * private val tokenSeparator: Regex = Regex("""\s"""),
+   */
+  private val singleLineComments: Regex? = null,
+  private val multilineComments: Pair<Regex, Regex>? = null,
   private val identifiers: Regex = Regex("""[a-zA-Z_]\w*"""),
   private val keywords: List<String> = emptyList(),
-  private val operators: List<String> = emptyList(),
-  private val separators: List<String> = emptyList(),
+  private val operators: Regex? = null,
+  private val separators: Regex? = null,
   private val literals: Literals = Literals()
 ) {
   private var position = Position(0, 0)
@@ -39,6 +42,9 @@ class Lexer(
       if (value.shouldAdvanceLine()) {
         tokenInvalidation = true
       }
+      // TODO if position moves to new line, then automatically fetch the next line.
+      //    Also removes the need for tokenInvalidation (maybe).
+      //    This change breaks the test cases currently. Requires debugging.
       field = value
     }
 
@@ -117,29 +123,37 @@ class Lexer(
   }
 
   private fun skipOverComments() {
-    if (singleLineComments != null) {
-      if (currentLine.substring(position.col).startsWith(singleLineComments)) {
-        // point position to outside the line
-        position = position.copy(col = currentLine.length)
-      }
-    }
-
-    if (multilineComments != null) {
-      val (start, end) = multilineComments
-      if (currentLine.substring(position.col).startsWith(start)) {
-        while (true) {
-          val to = currentLine.indexOf(end, startIndex = position.col)
-          if (to == -1) {
-            position = position.nextLine()
-            fetchNextLine()
-            continue
-          }
-
-          position = position.copy(col = to + end.length)
-          break
+    singleLineComments
+      ?.find(currentLine) // find the comment
+      ?.let { match ->
+        if (match.range.first == position.col) { // assert comment is at the position
+          // point position to outside the line
+          position = position.copy(col = currentLine.length)
         }
       }
-    }
+
+    multilineComments
+      ?.let { (start, end) ->
+        start
+          .find(currentLine) // find the start regex
+          ?.let inner@{ startMatch ->
+            if (startMatch.range.first != position.col) // assert start symbol is at the position
+              return@inner
+
+            while (true) {
+              val endMatch = end.find(currentLine, startIndex = position.col)
+              if (endMatch == null) { // if failed, move to next line and try again
+                position = position.nextLine()
+                fetchNextLine()
+                continue
+              }
+
+              // When found, move position to after the end of comment symbol
+              position = position.copy(col = endMatch.range.last + 1)
+              break
+            }
+          }
+      }
   }
 
   private fun adjustPositionIfNeeded() {
@@ -160,24 +174,17 @@ class Lexer(
   }
 
   private fun buildDisjunctRegex(): Regex {
-    val patterns = mutableSetOf(tokenSeparator.pattern).apply {
-      addAll(operators)
-      addAll(separators)
-    }
+    val patterns = mutableSetOf("\\s")
 
-    singleLineComments?.let { patterns.add(it) }
+    operators?.let { patterns.add(it.pattern) }
+    separators?.let { patterns.add(it.pattern) }
+    singleLineComments?.let { patterns.add(it.pattern) }
     multilineComments?.let { (start, end) ->
-      patterns.add(start)
-      patterns.add(end)
+      patterns.add(start.pattern)
+      patterns.add(end.pattern)
     }
 
-    // TODO the mapping to escape regex shorthands is ugly.
-    //    Maybe find a better solution.
-    patterns.map {
-      it.replace("*", "\\*")
-    }.also {
-      return Regex(it.joinToString("|"))
-    }
+    return Regex(patterns.joinToString("|"))
   }
 
   private fun MutableList<Token>.addToken(
