@@ -11,7 +11,7 @@ plugins {
   `java-library`
 }
 
-group = "io.github.cybercodernaj"
+group = "io.github.cybercoder-naj"
 version = libs.versions.lib.get()
 
 val docsDir = layout.projectDirectory.dir("docs/")
