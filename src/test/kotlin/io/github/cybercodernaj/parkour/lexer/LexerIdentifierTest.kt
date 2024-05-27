@@ -35,6 +35,41 @@ class LexerIdentifierTest {
   }
 
   @Test
+  fun `returns 3 identifiers in same line`() {
+    lexer.source = StringSource("name age hello")
+
+    val token = lexer.nextToken()
+    assertEquals(
+      Token.Identifier(
+        name = "name",
+        start = Position(0, 0),
+        end = Position(0, 3)
+      ),
+      token
+    )
+
+    val token2 = lexer.nextToken()
+    assertEquals(
+      Token.Identifier(
+        name = "age",
+        start = Position(0, 5),
+        end = Position(0, 7)
+      ),
+      token2
+    )
+
+    val token3 = lexer.nextToken()
+    assertEquals(
+      Token.Identifier(
+        name = "hello",
+        start = Position(0, 9),
+        end = Position(0, 13)
+      ),
+      token3
+    )
+  }
+
+  @Test
   fun `first returns an identifier, then EOF`() {
     lexer.source = StringSource("name\n  \n  ")
 

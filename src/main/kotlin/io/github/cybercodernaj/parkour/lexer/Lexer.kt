@@ -40,9 +40,6 @@ class Lexer(
 ) {
   private var position = Position(0, 0)
     private set(value) {
-      if (value.shouldAdvanceLine()) {
-        areTokensInvalid = true
-      }
       // TODO if position moves to new line, then automatically fetch the next line.
       //    Also removes the need for tokenInvalidation (maybe).
       //    This change breaks the test cases currently. Requires debugging.
@@ -57,7 +54,6 @@ class Lexer(
 
   private var tokenIndex = 0
   private var tokenStream = emptyList<Token>()
-  private var areTokensInvalid = true
 
   private val combinedTokenSeparator: Regex
 
@@ -74,7 +70,7 @@ class Lexer(
    * @since 0.0.1
    */
   internal fun nextToken(): Token {
-    if (areTokensInvalid)
+    if (tokenIndex >= tokenStream.size)
       updateTokenStream()
 
     if (tokenStream.isEmpty()) {
