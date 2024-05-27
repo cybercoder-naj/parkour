@@ -1,0 +1,8 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:io.github.cybercodernaj.parkour////PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour/index.html
+$dokka.location:io.github.cybercodernaj.parkour/Parser///PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour/-parser/index.html
+$dokka.location:io.github.cybercodernaj.parkour/Parser/Parser/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour/-parser/-parser.html
+$dokka.location:io.github.cybercodernaj.parkour/Parser/someFunction/#/PointingToDeclaration/-parkour/io.github.cybercodernaj.parkour/-parser/some-function.html
+io.github.cybercodernaj.parkour
+
