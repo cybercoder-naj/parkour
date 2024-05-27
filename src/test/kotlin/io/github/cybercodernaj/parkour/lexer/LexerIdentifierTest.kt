@@ -1,6 +1,7 @@
 package io.github.cybercodernaj.parkour.lexer
 
 import io.github.cybercodernaj.parkour.datasource.StringSource
+import io.github.cybercodernaj.parkour.exceptions.LexicalException
 import io.github.cybercodernaj.parkour.utils.Position
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -57,7 +58,8 @@ class LexerIdentifierTest {
     try {
       val token = lexer.nextToken()
       fail("The token $token should not have been returned")
-    } catch (_: Exception) {
+    } catch (ex: Exception) {
+      assertTrue(ex is LexicalException, "$ex is not a lexical exception")
     }
   }
 

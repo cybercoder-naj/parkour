@@ -1,6 +1,7 @@
 package io.github.cybercodernaj.parkour.lexer
 
 import io.github.cybercodernaj.parkour.datasource.TextSource
+import io.github.cybercodernaj.parkour.exceptions.LexicalException
 import io.github.cybercodernaj.parkour.utils.Position
 
 /**
@@ -170,8 +171,7 @@ class Lexer(
     if (identifiers.matches(tokenStr)) {
       return Token.Identifier(tokenStr, start, end)
     }
-    // TODO replace this with a custom exception
-    throw Exception("Lexical error: Cannot classify the token: $tokenStr")
+    throw LexicalException("Lexical error: Cannot classify the token: $tokenStr")
   }
 
   private fun buildDisjunctRegex(): Regex {
