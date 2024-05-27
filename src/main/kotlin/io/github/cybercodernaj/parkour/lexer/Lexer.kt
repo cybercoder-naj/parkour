@@ -9,17 +9,17 @@ import io.github.cybercodernaj.parkour.utils.Position
  * It will perform lexical analysis on a line-by-line basis and return the next unconsumed token.
  *
  * @constructor Creates a lexer with the provided properties.
- * @property tokenSeparator The regex to split a given line to the lexer.
+ * @param tokenSeparator The regex to split a given line to the lexer.
  *    Newline characters are **always** token separators. (Default: "\s")
- * @property singleLineComments The string that defines how a single-line comment starts.
+ * @param singleLineComments The string that defines how a single-line comment starts.
  *    Once identified, the lexer will skip the remaining line. (Default: null)
- * @property multilineComments A pair of strings, the starting pattern and the ending pattern for a
+ * @param multilineComments A pair of strings, the starting pattern and the ending pattern for a
  *    multiline comment block. (Default: null)
- * @property identifiers A regex string that defines the rules for identifying a name. (Default: "[a-zA-Z_]\w*")
- * @property keywords A list of strings that are considered as keywords. (Default: [])
- * @property operators A list of strings that are considered as operators. (Default: [])
- * @property separators A list of strings that are considered as separators. (Default: [])
- * @property literals A configuration of the literals to be considered. (Default: see [Literals])
+ * @param identifiers A regex string that defines the rules for identifying a name. (Default: "[a-zA-Z_]\w*")
+ * @param keywords A list of strings that are considered as keywords. (Default: [])
+ * @param operators A list of strings that are considered as operators. (Default: [])
+ * @param separators A list of strings that are considered as separators. (Default: [])
+ * @param literals A configuration of the literals to be considered. (Default: see [Literals])
  *
  * @author Nishant Aanjaney Jalan
  * @since 0.0.1
