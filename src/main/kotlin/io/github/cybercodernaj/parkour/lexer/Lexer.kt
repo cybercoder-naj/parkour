@@ -39,12 +39,6 @@ class Lexer(
   private val literals: Literals = Literals()
 ) {
   private var position = Position(0, 0)
-    private set(value) {
-      // TODO if position moves to new line, then automatically fetch the next line.
-      //    Also removes the need for tokenInvalidation (maybe).
-      //    This change breaks the test cases currently. Requires debugging.
-      field = value
-    }
 
   internal lateinit var source: TextSource
 
