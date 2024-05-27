@@ -22,7 +22,7 @@ jobs:
         run: ./gradlew :dokkaHtml
 
       - name: Bundle Docs
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: "./docs"
 
