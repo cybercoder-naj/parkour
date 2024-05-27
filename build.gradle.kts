@@ -9,6 +9,7 @@ plugins {
   alias(libs.plugins.dokka)
   alias(libs.plugins.maven.publishing)
   `java-library`
+  signing
 }
 
 group = "io.github.cybercoder-naj"
@@ -46,6 +47,19 @@ tasks.withType<DokkaTask>().configureEach {
 
 tasks.clean {
   delete = setOf(docsDir, layout.buildDirectory)
+}
+
+tasks.register<Jar>("dokkaHtmlJar") {
+  dependsOn(tasks.dokkaHtml)
+  from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+  archiveClassifier.set("html-docs")
+}
+
+signing {
+  val signingKey: String? by project
+  val signingPassword: String? by project
+  useInMemoryPgpKeys(signingKey, signingPassword)
+  sign(tasks["kotlinSourcesJar"], tasks["dokkaHtmlJar"])
 }
 
 mavenPublishing {
