@@ -55,13 +55,6 @@ tasks.register<Jar>("dokkaHtmlJar") {
   archiveClassifier.set("html-docs")
 }
 
-signing {
-  val signingKey: String? by project
-  val signingPassword: String? by project
-  useInMemoryPgpKeys(signingKey, signingPassword)
-  sign(tasks["kotlinSourcesJar"], tasks["dokkaHtmlJar"])
-}
-
 mavenPublishing {
   configure(KotlinJvm(
     javadocJar = JavadocJar.Dokka("dokkaHtml"),
@@ -69,6 +62,8 @@ mavenPublishing {
   ))
 
   publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
+
+  signAllPublications()
 
   coordinates(project.group.toString(), project.name, project.version.toString())
 
