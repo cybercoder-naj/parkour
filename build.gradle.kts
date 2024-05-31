@@ -9,6 +9,7 @@ plugins {
   alias(libs.plugins.dokka)
   alias(libs.plugins.maven.publishing)
   `java-library`
+  signing
 }
 
 group = "io.github.cybercoder-naj"
@@ -28,7 +29,7 @@ tasks.test {
   useJUnitPlatform()
 }
 kotlin {
-  jvmToolchain(18)
+  jvmToolchain(17)
 }
 
 tasks.withType<DokkaTask>().configureEach {
@@ -48,6 +49,12 @@ tasks.clean {
   delete = setOf(docsDir, layout.buildDirectory)
 }
 
+tasks.register<Jar>("dokkaHtmlJar") {
+  dependsOn(tasks.dokkaHtml)
+  from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+  archiveClassifier.set("html-docs")
+}
+
 mavenPublishing {
   configure(KotlinJvm(
     javadocJar = JavadocJar.Dokka("dokkaHtml"),
@@ -55,6 +62,8 @@ mavenPublishing {
   ))
 
   publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
+
+  signAllPublications()
 
   coordinates(project.group.toString(), project.name, project.version.toString())
 

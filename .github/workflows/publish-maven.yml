@@ -18,6 +18,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           generateReleaseNotes: true
+          prerelease: ${{ startsWith(github.ref, 'refs/tags/v0') }}
 
   generate-docs:
     needs: create-release
@@ -34,7 +35,7 @@ jobs:
         run: ./gradlew :dokkaHtml
 
       - name: Bundle Docs
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v1
         with:
           path: "./docs"
 
