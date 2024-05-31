@@ -8,32 +8,33 @@ import io.github.cybercodernaj.parkour.utils.Position
  * The lexer is responsible to convert the given string into a stream of [Token]s.
  * The lexer take in multiple settings that configure how it behaves.
  * It will perform lexical analysis on a line-by-line basis and return the next unconsumed token.
- * Tokens are separated by the Regex, "\s".
+ * A newline character is **always** separates a token.
  *
  * @constructor Creates a lexer with the provided properties.
- * @param singleLineComments The string that defines how a single-line comment starts.
+ * @param ignorePattern characters that satisfy this regex would be skipped. (Default: "\s+")
+ * @param singleLineComments The regex that defines how a single-line comment starts.
  *    Once identified, the lexer will skip the remaining line. (Default: null)
- * @param multilineComments A pair of strings, the starting pattern and the ending pattern for a
+ * @param multilineComments A pair of regexes, the starting pattern and the ending pattern for a
  *    multiline comment block. (Default: null)
- * @param identifiers A regex string that defines the rules for identifying a name. (Default: "[a-zA-Z_]\w*")
- * @param keywords A list of strings that are considered as keywords. (Default: [])
- * @param operators A list of strings that are considered as operators. (Default: [])
- * @param separators A list of strings that are considered as separators. (Default: [])
- * @param literals A configuration of the literals to be considered. (Default: see [Literals])
+ * @param identifiers A regex string that defines the rules for defining a name. (Default: "[a-zA-Z_]\w*")
+ * @param hardKeywords A list of strings that are considered hard keywords.
+ *    Hard keywords are a characters and symbols that give a particular meaning to a program. (Default: [])
+ * @param operators A regex that are considered as operators.
+ *    Operators are characters and symbols that may perform arithmetic or logical operations. (Default: [])
+ * @param separators A regex that are considered as separators.
+ *    Separators are characters and symbols that act like delimiters to separate other meaningful elements. (Default: [])
+ * @param literals The configuration of literals. Literals denote constant values
+ * such as numbers, strings, and characters. (Default: see [Literals])
  *
  * @author Nishant Aanjaney Jalan
  * @since 0.0.1
  */
 class Lexer(
-  /*
-   * @param tokenSeparator The regex to split a given line to the lexer.
-   *    Newline characters are **always** token separators. (Default: "\s")
-   * private val tokenSeparator: Regex = Regex("""\s"""),
-   */
+  private val ignorePattern: Regex = Regex("""\s+"""),
   private val singleLineComments: Regex? = null,
   private val multilineComments: Pair<Regex, Regex>? = null,
   private val identifiers: Regex = Regex("""[a-zA-Z_]\w*"""),
-  private val keywords: List<String> = emptyList(),
+  private val hardKeywords: List<String> = emptyList(),
   private val operators: Regex? = null,
   private val separators: Regex? = null,
   private val literals: Literals = Literals()
