@@ -14,95 +14,53 @@ class LexerSeparatorTest {
   fun `returns a series of valid tokens`() {
     lexer.source = StringSource("List<String>(str1, str2)")
 
-    val token = lexer.nextToken()
-    assertEquals(
+    assertTokens(lexer, listOf(
       Token.Identifier(
         name = "List",
         start = Position(0, 0),
         end = Position(0, 3)
       ),
-      token
-    )
-
-    val token2 = lexer.nextToken()
-    assertEquals(
       Token.Separator(
         name = "<",
         start = Position(0, 4),
         end = Position(0, 4)
       ),
-      token2
-    )
-
-    val token3 = lexer.nextToken()
-    assertEquals(
       Token.Identifier(
         name = "String",
         start = Position(0, 5),
         end = Position(0, 10)
       ),
-      token3
-    )
-
-    val token4 = lexer.nextToken()
-    assertEquals(
       Token.Separator(
         name = ">",
         start = Position(0, 11),
         end = Position(0, 11)
       ),
-      token4
-    )
-
-    val token5 = lexer.nextToken()
-    assertEquals(
       Token.Separator(
         name = "(",
         start = Position(0, 12),
         end = Position(0, 12)
       ),
-      token5
-    )
-
-    val token6 = lexer.nextToken()
-    assertEquals(
       Token.Identifier(
         name = "str1",
         start = Position(0, 13),
         end = Position(0, 16)
       ),
-      token6
-    )
-
-    val token7 = lexer.nextToken()
-    assertEquals(
       Token.Separator(
         name = ",",
         start = Position(0, 17),
         end = Position(0, 17)
       ),
-      token7
-    )
-
-    val token8 = lexer.nextToken()
-    assertEquals(
       Token.Identifier(
         name = "str2",
         start = Position(0, 19),
         end = Position(0, 22)
       ),
-      token8
-    )
-
-    val token9 = lexer.nextToken()
-    assertEquals(
       Token.Separator(
         name = ")",
         start = Position(0, 23),
         end = Position(0, 23)
       ),
-      token9
-    )
+    ))
   }
 
   @Test
