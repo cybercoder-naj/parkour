@@ -52,13 +52,7 @@ class Lexer(
   private var tokenIndex = 0
   private var tokenStream = emptyList<Token>()
 
-  private val combinedTokenSeparator: Regex
-
   private var insideMultilineComment = false
-
-  init {
-    combinedTokenSeparator = buildDisjunctRegex()
-  }
 
   /**
    * Fetches the next [Token] from the source
@@ -89,12 +83,14 @@ class Lexer(
 
     val tokenStream = mutableListOf<Token>()
     while (position.col < currentLine.length) {
-      if (position isAt singleLineComments) {
+      val initial = position
+
+      if (position pointsAt singleLineComments != null) {
         position = position.copy(col = currentLine.length)
         break
       }
 
-      if (!insideMultilineComment && position isAt multilineComments?.first) {
+      if (!insideMultilineComment && position pointsAt multilineComments?.first != null) {
         insideMultilineComment = true
       }
       if (insideMultilineComment) {
@@ -108,28 +104,24 @@ class Lexer(
         }
       }
 
-      val start = position
+      (position pointsAt ignorePattern)
+        ?.let { match ->
+          position = position.copy(col = match.range.last + 1)
+        }
 
-      val match = combinedTokenSeparator.find(currentLine, startIndex = start.col)
-      val end = if (match == null) { // capture the remaining string
-        start.copy(col = currentLine.length - 1)
-      } else {
-        start.copy(col = match.range.first - 1)
-      }
+      (position pointsAt identifiers)
+        ?.let { match ->
+          val end = position.copy(col = match.range.last)
+          tokenStream.addIdentifier(position, end)
+          position = end + 1
+        }
 
-      if (start >= end) {
-        // when start points to the end of the line which means match results in null.
-        // OR
-        // position points to a tokenSeparator; increment position and try again.
-        position++
-        continue
-      }
-
-      tokenStream.addToken(start, end)
-      position = end
+      if (position == initial)
+        throw LexicalException("Could not identify the given token.")
     }
 
     this.tokenStream = tokenStream
+    adjustPositionIfNeeded()
   }
 
   private fun fetchNextLine() {
@@ -141,49 +133,25 @@ class Lexer(
       position = position.nextLine()
   }
 
-  private fun classifyToken(
-    tokenStr: String,
-    start: Position,
-    end: Position
-  ): Token {
-    if (identifiers.matches(tokenStr)) {
-      return Token.Identifier(tokenStr, start, end)
-    }
-    throw LexicalException("Cannot classify the token: $tokenStr")
-  }
-
-  private fun buildDisjunctRegex(): Regex {
-    val patterns = mutableSetOf("\\s")
-
-    operators?.let { patterns.add(it.pattern) }
-    separators?.let { patterns.add(it.pattern) }
-    singleLineComments?.let { patterns.add(it.pattern) }
-    multilineComments?.let { (start, end) ->
-      patterns.add(start.pattern)
-      patterns.add(end.pattern)
-    }
-
-    return Regex(patterns.joinToString("|"))
-  }
-
-  private fun MutableList<Token>.addToken(
+  private fun MutableList<Token>.addIdentifier(
     start: Position,
     end: Position
   ) {
-    val tokenStr = currentLine.substring(start..end)
-    this.add(classifyToken(tokenStr, start, end))
+    val identifier = currentLine.substring(start..end)
+    this.add(Token.Identifier(identifier, start, end))
   }
 
   private fun Position.shouldAdvanceLine(): Boolean {
     return this.col >= currentLine.length
   }
 
-  private infix fun Position.isAt(pattern: Regex?): Boolean {
+  private infix fun Position.pointsAt(pattern: Regex?): MatchResult? {
     return pattern
-      ?.find(currentLine)
+      ?.find(currentLine, startIndex = this.col)
       ?.let { match ->
-        return@let (match.range.first == position.col)
-      } ?: false
+        if (match.range.first == this.col)
+          match
+        else null
+      }
   }
 }
-
