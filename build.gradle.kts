@@ -3,6 +3,7 @@ import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.dokka.gradle.DokkaTask
 import java.net.URI
+import java.util.*
 
 plugins {
   kotlin("jvm") version "2.0.0"
@@ -33,7 +34,8 @@ kotlin {
 }
 
 tasks.withType<DokkaTask>().configureEach {
-  moduleName.set(project.name)
+  val projectName = project.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+  moduleName.set(projectName)
   moduleVersion.set(project.version.toString())
   outputDirectory.set(docsDir)
   dokkaSourceSets.configureEach {
