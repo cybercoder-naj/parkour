@@ -39,7 +39,7 @@ tasks.withType<DokkaTask>().configureEach {
   dokkaSourceSets.configureEach {
     sourceLink {
       localDirectory.set(projectDir.resolve("src"))
-      remoteUrl.set(URI.create("https://github.com/cybercoder-naj/Parkour/blob/main/src").toURL())
+      remoteUrl.set(URI.create("https://github.com/cybercoder-naj/parkour/tree/main/src").toURL())
       remoteLineSuffix.set("#L")
     }
   }
@@ -68,14 +68,14 @@ mavenPublishing {
   coordinates(project.group.toString(), project.name, project.version.toString())
 
   pom {
-    name.set("Parkour")
+    name.set("parkour")
     description.set("Parser Combinator library for Kotlin")
     inceptionYear.set("2024")
-    url.set("https://github.com/cybercoder-naj/Parkour/")
+    url.set("https://github.com/cybercoder-naj/parkour/")
     licenses {
       license {
         name.set("MIT License")
-        url.set("https://github.com/cybercoder-naj/Parkour/blob/main/LICENSE")
+        url.set("https://github.com/cybercoder-naj/parkour/tree/main/LICENSE")
         distribution.set("repo")
       }
     }
@@ -87,9 +87,9 @@ mavenPublishing {
       }
     }
     scm {
-      url.set("https://github.com/cybercoder-naj/Parkour/")
-      connection.set("scm:git:git://github.com/cybercoder-naj/Parkour.git")
-      developerConnection.set("scm:git:ssh://git@github.com/cybercoder-naj/Parkour.git")
+      url.set("https://github.com/cybercoder-naj/parkour/")
+      connection.set("scm:git:git://github.com/cybercoder-naj/parkour.git")
+      developerConnection.set("scm:git:ssh://git@github.com/cybercoder-naj/parkour.git")
     }
   }
 }
