@@ -20,9 +20,11 @@ import io.github.cybercodernaj.parkour.utils.Position
  * @param hardKeywords A list of strings that are considered hard keywords.
  *    Hard keywords are a characters and symbols that give a particular meaning to a program. (Default: [])
  * @param operators A regex that are considered as operators.
- *    Operators are characters and symbols that may perform arithmetic or logical operations. (Default: [])
+ *    Operators are characters and symbols that may perform arithmetic or logical operations.
+ *    Longer operators must be earlier in the pattern to be matched. (Default: [])
  * @param separators A regex that are considered as separators.
- *    Separators are characters and symbols that act like delimiters to separate other meaningful elements. (Default: [])
+ *    Separators are characters and symbols that act like delimiters to separate other meaningful elements.
+ *    Longer separators must be earlier in the pattern to be matched. (Default: [])
  * @param literals The configuration of literals. Literals denote constant values
  * such as numbers, strings, and characters. (Default: see [Literals])
  *
