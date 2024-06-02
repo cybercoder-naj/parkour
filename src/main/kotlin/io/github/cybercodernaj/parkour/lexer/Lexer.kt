@@ -89,7 +89,25 @@ class Lexer(
 
     val tokenStream = mutableListOf<Token>()
     while (position.col < currentLine.length) {
-      skipOverComments()
+      if (position isAt singleLineComments) {
+        position = position.copy(col = currentLine.length)
+        break
+      }
+
+      if (!insideMultilineComment && position isAt multilineComments?.first) {
+        insideMultilineComment = true
+      }
+      if (insideMultilineComment) {
+        val match = multilineComments!!.second.find(currentLine, startIndex = position.col)
+        if (match == null) {
+          position = position.copy(col = currentLine.length)
+          break
+        } else {
+          position = position.copy(col = match.range.last + 1)
+          insideMultilineComment = false
+        }
+      }
+
       val start = position
 
       val match = combinedTokenSeparator.find(currentLine, startIndex = start.col)
@@ -116,39 +134,6 @@ class Lexer(
 
   private fun fetchNextLine() {
     _currentLine = source.fetchLine(position.line)
-  }
-
-  private fun skipOverComments() {
-    singleLineComments
-      ?.find(currentLine) // find the comment
-      ?.let { match ->
-        if (match.range.first == position.col) { // assert comment is at the position
-          // point position to outside the line
-          position = position.copy(col = currentLine.length)
-        }
-      }
-
-    multilineComments
-      ?.let { (start, end) ->
-        if (!insideMultilineComment) {
-          start.find(currentLine)?.let inner@{ match ->
-            if (match.range.first != position.col) // valid only if position points to the start of the comment
-              return@inner
-
-            insideMultilineComment = true
-          }
-        }
-
-        if (insideMultilineComment) {
-          val match = end.find(currentLine, startIndex = position.col)
-          if (match == null) {
-            position = position.copy(col = currentLine.length)
-          } else {
-            position = position.copy(col = match.range.last + 1)
-            insideMultilineComment = false
-          }
-        }
-      }
   }
 
   private fun adjustPositionIfNeeded() {
@@ -191,6 +176,14 @@ class Lexer(
 
   private fun Position.shouldAdvanceLine(): Boolean {
     return this.col >= currentLine.length
+  }
+
+  private infix fun Position.isAt(pattern: Regex?): Boolean {
+    return pattern
+      ?.find(currentLine)
+      ?.let { match ->
+        return@let (match.range.first == position.col)
+      } ?: false
   }
 }
 
