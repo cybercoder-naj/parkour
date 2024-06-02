@@ -119,6 +119,20 @@ class Lexer(
           position = end + 1
         }
 
+      (position startsWith _operators)
+        ?.let { keyword ->
+          val end = position.copy(col = position.col + keyword.length - 1)
+          tokenStream.addOperator(position, end)
+          position = end + 1
+        }
+
+      (position startsWith _separators)
+        ?.let { keyword ->
+          val end = position.copy(col = position.col + keyword.length - 1)
+          tokenStream.addSeparator(position, end)
+          position = end + 1
+        }
+
       (position pointsAt identifiers)
         ?.let { match ->
           val end = position.copy(col = match.range.last)
@@ -157,6 +171,22 @@ class Lexer(
   ) {
     val identifier = currentLine.substring(start..end)
     this.add(Token.Keyword(identifier, start, end))
+  }
+
+  private fun MutableList<Token>.addOperator(
+    start: Position,
+    end: Position
+  ) {
+    val identifier = currentLine.substring(start..end)
+    this.add(Token.Operator(identifier, start, end))
+  }
+
+  private fun MutableList<Token>.addSeparator(
+    start: Position,
+    end: Position
+  ) {
+    val identifier = currentLine.substring(start..end)
+    this.add(Token.Separator(identifier, start, end))
   }
 
   private fun Position.shouldAdvanceLine(): Boolean {

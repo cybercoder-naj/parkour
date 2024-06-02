@@ -11,5 +11,7 @@ import io.github.cybercodernaj.parkour.utils.Position
 internal sealed class Token {
   data class Identifier(val name: String, val start: Position, val end: Position) : Token()
   data class Keyword(val name: String, val start: Position, val end: Position, val soft: Boolean = false) : Token()
+  data class Operator(val name: String, val start: Position, val end: Position) : Token()
+  data class Separator(val name: String, val start: Position, val end: Position) : Token()
   data object EOF : Token()
 }
