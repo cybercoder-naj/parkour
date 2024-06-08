@@ -7,7 +7,7 @@ package io.github.cybercodernaj.parkour.exceptions
  *  2. When a literal does not abide by the rules and constraints.
  *
  * @author Nishant Aanjaney Jalan
- * @since 0.0.1
+ * @since 0.1.0
  */
 class LexicalException(
   message: String? = null,

@@ -5,7 +5,7 @@ package io.github.cybercodernaj.parkour.utils
  * Holds the line and column number in the contents defined by the strategies.
  *
  * @author Nishant Aanjaney Jalan
- * @since 0.0.1
+ * @since 0.1.0
  */
 internal data class Position(
   val line: Int,

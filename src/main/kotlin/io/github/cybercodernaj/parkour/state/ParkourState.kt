@@ -6,7 +6,7 @@ import io.github.cybercodernaj.parkour.lexer.Lexer
  * The [ParkourState] maintains the state of the parsing state.
  *
  * @author Nishant Aanjaney Jalan
- * @since 0.0.1
+ * @since 0.1.0
  */
 internal abstract class ParkourState(
   private val lexer: Lexer,

@@ -28,7 +28,7 @@ import io.github.cybercodernaj.parkour.utils.Position
  * such as numbers, strings, and characters. (Default: see [Literals])
  *
  * @author Nishant Aanjaney Jalan
- * @since 0.0.1
+ * @since 0.1.0
  */
 class Lexer(
   private val ignorePattern: Regex = Regex("""\s+"""),
@@ -61,7 +61,7 @@ class Lexer(
    * Fetches the next [Token] from the source
    *
    * @author Nishant Aanjaney Jalan
-   * @since 0.0.1
+   * @since 0.1.0
    */
   internal fun nextToken(): Token {
     if (tokenIndex >= tokenStream.size)
