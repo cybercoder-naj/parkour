@@ -4,7 +4,6 @@ import io.github.cybercodernaj.parkour.datasource.StringSource
 import io.github.cybercodernaj.parkour.testutils.assertTokens
 import io.github.cybercodernaj.parkour.utils.Position
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 class LexerOperatorTest {
   private val lexer = Lexer(
@@ -18,33 +17,33 @@ class LexerOperatorTest {
 
     assertTokens(lexer, listOf(
       Token.Keyword(
-        name = "val",
+        value = "val",
         start = Position(0, 0),
         end = Position(0, 2),
         soft = false
       ),
       Token.Identifier(
-        name = "diff",
+        value = "diff",
         start = Position(0, 4),
         end = Position(0, 7)
       ),
       Token.Operator(
-        name = "=",
+        value = "=",
         start = Position(0, 9),
         end = Position(0, 9)
       ),
       Token.Identifier(
-        name = "new",
+        value = "new",
         start = Position(0, 11),
         end = Position(0, 13)
       ),
       Token.Operator(
-        name = "-",
+        value = "-",
         start = Position(0, 15),
         end = Position(0, 15)
       ),
       Token.Identifier(
-        name = "old",
+        value = "old",
         start = Position(0, 17),
         end = Position(0, 19)
       )
@@ -57,47 +56,47 @@ class LexerOperatorTest {
 
     assertTokens(lexer, listOf(
       Token.Identifier(
-        name = "n1",
+        value = "n1",
         start = Position(0, 0),
         end = Position(0, 1)
       ),
       Token.Operator(
-        name = "*",
+        value = "*",
         start = Position(0, 3),
         end = Position(0, 3)
       ),
       Token.Identifier(
-        name = "n2",
+        value = "n2",
         start = Position(0, 5),
         end = Position(0, 6)
       ),
       Token.Identifier(
-        name = "n3",
+        value = "n3",
         start = Position(1, 0),
         end = Position(1, 1)
       ),
       Token.Operator(
-        name = "**",
+        value = "**",
         start = Position(1, 2),
         end = Position(1, 3)
       ),
       Token.Identifier(
-        name = "n4",
+        value = "n4",
         start = Position(1, 4),
         end = Position(1, 5)
       ),
       Token.Identifier(
-        name = "n5",
+        value = "n5",
         start = Position(2, 0),
         end = Position(2, 1)
       ),
       Token.Operator(
-        name = "//",
+        value = "//",
         start = Position(2, 2),
         end = Position(2, 3)
       ),
       Token.Identifier(
-        name = "n6",
+        value = "n6",
         start = Position(2, 5),
         end = Position(2, 6)
       ),

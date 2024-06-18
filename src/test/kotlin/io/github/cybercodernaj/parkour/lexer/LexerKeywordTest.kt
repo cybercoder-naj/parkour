@@ -15,7 +15,7 @@ class LexerKeywordTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Keyword(
-        name = "val",
+        value = "val",
         start = Position(0, 0),
         end = Position(0, 2),
         soft = false
@@ -31,7 +31,7 @@ class LexerKeywordTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Keyword(
-        name = "val",
+        value = "val",
         start = Position(0, 0),
         end = Position(0, 2),
         soft = false
@@ -42,7 +42,7 @@ class LexerKeywordTest {
     val token2 = lexer.nextToken()
     assertEquals(
       Token.Keyword(
-        name = "class",
+        value = "class",
         start = Position(0, 4),
         end = Position(0, 8),
         soft = false
@@ -58,7 +58,7 @@ class LexerKeywordTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Keyword(
-        name = "val",
+        value = "val",
         start = Position(0, 0),
         end = Position(0, 2),
         soft = false
@@ -69,7 +69,7 @@ class LexerKeywordTest {
     val token2 = lexer.nextToken()
     assertEquals(
       Token.Keyword(
-        name = "class",
+        value = "class",
         start = Position(1, 1),
         end = Position(1, 5),
         soft = false
@@ -85,7 +85,7 @@ class LexerKeywordTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Keyword(
-        name = "val",
+        value = "val",
         start = Position(0, 0),
         end = Position(0, 2),
         soft = false
@@ -96,7 +96,7 @@ class LexerKeywordTest {
     val token2 = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "age",
+        value = "age",
         start = Position(0, 4),
         end = Position(0, 6)
       ),

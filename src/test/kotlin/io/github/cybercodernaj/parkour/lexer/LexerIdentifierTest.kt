@@ -26,7 +26,7 @@ class LexerIdentifierTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "name",
+        value = "name",
         start = Position(0, 0),
         end = Position(0, 3)
       ),
@@ -41,7 +41,7 @@ class LexerIdentifierTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "name",
+        value = "name",
         start = Position(0, 0),
         end = Position(0, 3)
       ),
@@ -51,7 +51,7 @@ class LexerIdentifierTest {
     val token2 = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "age",
+        value = "age",
         start = Position(0, 5),
         end = Position(0, 7)
       ),
@@ -61,7 +61,7 @@ class LexerIdentifierTest {
     val token3 = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "hello",
+        value = "hello",
         start = Position(0, 9),
         end = Position(0, 13)
       ),
@@ -76,7 +76,7 @@ class LexerIdentifierTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "name",
+        value = "name",
         start = Position(0, 0),
         end = Position(0, 3)
       ),
@@ -105,7 +105,7 @@ class LexerIdentifierTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "name",
+        value = "name",
         start = Position(0, 0),
         end = Position(0, 3)
       ),
@@ -115,7 +115,7 @@ class LexerIdentifierTest {
     val token2 = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "name2",
+        value = "name2",
         start = Position(1, 2),
         end = Position(1, 6)
       ),
@@ -125,7 +125,7 @@ class LexerIdentifierTest {
     val token3 = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "name3",
+        value = "name3",
         start = Position(2, 2),
         end = Position(2, 6)
       ),

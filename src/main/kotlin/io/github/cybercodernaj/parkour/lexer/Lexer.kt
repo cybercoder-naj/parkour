@@ -119,6 +119,12 @@ class Lexer(
           position = end + 1
         }
 
+      tryLiterals()
+        ?.let { token ->
+          tokenStream.add(token)
+          position = token.end + 1
+        }
+
       (position startsWith _operators)
         ?.let { keyword ->
           val end = position.copy(col = position.col + keyword.length - 1)
@@ -146,6 +152,32 @@ class Lexer(
 
     this.tokenStream = tokenStream
     adjustPositionIfNeeded()
+  }
+
+  private fun tryLiterals(): Token.Literal? {
+//    (position pointsAt literals.floatingLiteral)
+//      ?.let { match ->
+//        if (match.value.isBlank())
+//          return null
+//
+//        val end = position.copy(col = match.range.last)
+//        match.value.toDoubleOrNull()?.let { value ->
+//          return Token.Literal.FloatLiteral(value, position, end)
+//        } ?: throw LexicalException("Double regex is badly formed.")
+//      }
+
+    (position pointsAt literals.integerLiteral)
+      ?.let { match ->
+        if (match.value.isBlank())
+          return null
+
+        val end = position.copy(col = match.range.last)
+        match.value.toLongOrNull()?.let { value ->
+          return Token.Literal.IntLiteral(value, position, end)
+        } ?: throw LexicalException("Int regex is badly formed.")
+      }
+
+    return null
   }
 
   private fun fetchNextLine() {

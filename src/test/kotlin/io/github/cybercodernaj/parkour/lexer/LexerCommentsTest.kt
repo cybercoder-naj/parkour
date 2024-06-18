@@ -26,7 +26,7 @@ class LexerCommentsTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "age",
+        value = "age",
         start = Position(0, 0),
         end = Position(0, 2)
       ),
@@ -41,7 +41,7 @@ class LexerCommentsTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "age",
+        value = "age",
         start = Position(0, 0),
         end = Position(0, 2)
       ),
@@ -51,7 +51,7 @@ class LexerCommentsTest {
     val token2 = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "hello",
+        value = "hello",
         start = Position(1, 0),
         end = Position(1, 4)
       ),
@@ -66,7 +66,7 @@ class LexerCommentsTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "age",
+        value = "age",
         start = Position(0, 0),
         end = Position(0, 2)
       ),
@@ -76,7 +76,7 @@ class LexerCommentsTest {
     val token2 = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "hello",
+        value = "hello",
         start = Position(1, 0),
         end = Position(1, 4)
       ),
@@ -99,7 +99,7 @@ class LexerCommentsTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "age",
+        value = "age",
         start = Position(0, 0),
         end = Position(0, 2)
       ),
@@ -109,7 +109,7 @@ class LexerCommentsTest {
     val token2 = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "hello",
+        value = "hello",
         start = Position(6, 0),
         end = Position(6, 4)
       ),
@@ -131,7 +131,7 @@ class LexerCommentsTest {
     val token = lexer.nextToken()
     assertEquals(
       Token.Identifier(
-        name = "age",
+        value = "age",
         start = Position(0, 0),
         end = Position(0, 2)
       ),

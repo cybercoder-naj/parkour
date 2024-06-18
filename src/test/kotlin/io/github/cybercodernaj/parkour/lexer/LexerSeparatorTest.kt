@@ -4,8 +4,6 @@ import io.github.cybercodernaj.parkour.datasource.StringSource
 import io.github.cybercodernaj.parkour.testutils.assertTokens
 import io.github.cybercodernaj.parkour.utils.Position
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class LexerSeparatorTest {
   private val lexer = Lexer(separators = setOf("(", ")", "<", ">", ",", "."))
@@ -16,47 +14,47 @@ class LexerSeparatorTest {
 
     assertTokens(lexer, listOf(
       Token.Identifier(
-        name = "List",
+        value = "List",
         start = Position(0, 0),
         end = Position(0, 3)
       ),
       Token.Separator(
-        name = "<",
+        value = "<",
         start = Position(0, 4),
         end = Position(0, 4)
       ),
       Token.Identifier(
-        name = "String",
+        value = "String",
         start = Position(0, 5),
         end = Position(0, 10)
       ),
       Token.Separator(
-        name = ">",
+        value = ">",
         start = Position(0, 11),
         end = Position(0, 11)
       ),
       Token.Separator(
-        name = "(",
+        value = "(",
         start = Position(0, 12),
         end = Position(0, 12)
       ),
       Token.Identifier(
-        name = "str1",
+        value = "str1",
         start = Position(0, 13),
         end = Position(0, 16)
       ),
       Token.Separator(
-        name = ",",
+        value = ",",
         start = Position(0, 17),
         end = Position(0, 17)
       ),
       Token.Identifier(
-        name = "str2",
+        value = "str2",
         start = Position(0, 19),
         end = Position(0, 22)
       ),
       Token.Separator(
-        name = ")",
+        value = ")",
         start = Position(0, 23),
         end = Position(0, 23)
       ),
