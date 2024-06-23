@@ -155,16 +155,16 @@ class Lexer(
   }
 
   private fun tryLiterals(): Token.Literal? {
-//    (position pointsAt literals.floatingLiteral)
-//      ?.let { match ->
-//        if (match.value.isBlank())
-//          return null
-//
-//        val end = position.copy(col = match.range.last)
-//        match.value.toDoubleOrNull()?.let { value ->
-//          return Token.Literal.FloatLiteral(value, position, end)
-//        } ?: throw LexicalException("Double regex is badly formed.")
-//      }
+    (position pointsAt literals.floatingLiteral)
+      ?.let { match ->
+        if (match.value.isBlank())
+          return null
+
+        val end = position.copy(col = match.range.last)
+        match.value.toDoubleOrNull()?.let { value ->
+          return Token.Literal.FloatLiteral(value, position, end)
+        } ?: throw LexicalException("Double regex is badly formed.")
+      }
 
     (position pointsAt literals.integerLiteral)
       ?.let { match ->
@@ -172,9 +172,11 @@ class Lexer(
           return null
 
         val end = position.copy(col = match.range.last)
-        match.value.toLongOrNull()?.let { value ->
-          return Token.Literal.IntLiteral(value, position, end)
-        } ?: throw LexicalException("Int regex is badly formed.")
+        match.value
+          .replace("_", "")
+          .toLongOrNull()?.let { value ->
+            return Token.Literal.IntLiteral(value, position, end)
+          } ?: throw LexicalException("Int regex is badly formed. Tried parsing ${match.value} to an integer")
       }
 
     return null
