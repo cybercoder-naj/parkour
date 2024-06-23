@@ -8,8 +8,7 @@ package io.github.cybercodernaj.parkour.lexer
 class Literals(
   internal val integerLiteral: Regex? = Regex("""[-+]?[0-9_]+"""),
   internal val floatingLiteral: Regex? = Regex("""[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?"""),
-  internal val characterEnclosure: String = "'",
   internal val stringEnclosure: String = "\"",
   internal val booleanLiteral: Regex? = Regex("true|false"),
-  internal val escapeSequences: Map<String, Int> = mapOf(),
+  internal val escapeSequences: Map<Regex, Int> = mapOf(),
 )

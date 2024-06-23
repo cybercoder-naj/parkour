@@ -112,7 +112,7 @@ class Lexer(
           position = position.copy(col = match.range.last + 1)
         }
 
-      (position startsWith _hardKeywords)
+      (position pointsAtSome _hardKeywords)
         ?.let { keyword ->
           val end = position.copy(col = position.col + keyword.length - 1)
           tokenStream.addHardKeyword(position, end)
@@ -125,14 +125,14 @@ class Lexer(
           position = token.end + 1
         }
 
-      (position startsWith _operators)
+      (position pointsAtSome _operators)
         ?.let { keyword ->
           val end = position.copy(col = position.col + keyword.length - 1)
           tokenStream.addOperator(position, end)
           position = end + 1
         }
 
-      (position startsWith _separators)
+      (position pointsAtSome _separators)
         ?.let { keyword ->
           val end = position.copy(col = position.col + keyword.length - 1)
           tokenStream.addSeparator(position, end)
@@ -161,7 +161,9 @@ class Lexer(
           return null
 
         val end = position.copy(col = match.range.last)
-        match.value.toDoubleOrNull()?.let { value ->
+        match.value
+          .replace("_", "")
+          .toDoubleOrNull()?.let { value ->
           return Token.Literal.FloatLiteral(value, position, end)
         } ?: throw LexicalException("Double regex is badly formed.")
       }
@@ -178,6 +180,13 @@ class Lexer(
             return Token.Literal.IntLiteral(value, position, end)
           } ?: throw LexicalException("Int regex is badly formed. Tried parsing ${match.value} to an integer")
       }
+
+    if (position pointsAt literals.stringEnclosure) {
+      do {
+        position++
+        // TODO Collect string contents with escape sequences
+      } while (!(position pointsAt literals.stringEnclosure))
+    }
 
     return null
   }
@@ -237,7 +246,12 @@ class Lexer(
       }
   }
 
-  private infix fun Position.startsWith(list: List<String>): String? {
-    return list.find { currentLine.startsWith(it, startIndex = this.col) }
+  private infix fun Position.pointsAtSome(list: List<String>): String? {
+    return list.find { this.pointsAt(it) }
+  }
+
+  private infix fun Position.pointsAt(pattern: String): Boolean {
+    return currentLine.startsWith(pattern, startIndex = this.col)
   }
 }
+

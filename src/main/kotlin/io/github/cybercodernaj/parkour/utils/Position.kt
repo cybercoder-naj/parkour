@@ -15,9 +15,9 @@ internal data class Position(
     return Position(line + 1, 0)
   }
 
-  operator fun plus(other: Position): Position {
-    return Position(this.line + other.line, this.col + other.col)
-  }
+//  operator fun plus(other: Position): Position {
+//    return Position(this.line + other.line, this.col + other.col)
+//  }
 
   operator fun plus(colOffset: Int): Position =
     Position(line, col + colOffset)
@@ -32,4 +32,8 @@ internal data class Position(
   operator fun compareTo(end: Position): Int {
     return this.col compareTo end.col
   }
+}
+
+internal operator fun Position.plus(other: Position): Position {
+  return Position(this.line + other.line, this.col + other.col)
 }
