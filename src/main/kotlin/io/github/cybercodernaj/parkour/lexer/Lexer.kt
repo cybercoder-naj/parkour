@@ -239,10 +239,17 @@ class Lexer(
     this.add(Token.Separator(identifier, start, end))
   }
 
+  /**
+   * @return true if currentLine is invalidated
+   */
   private fun Position.shouldAdvanceLine(): Boolean {
     return this.col >= currentLine.length
   }
 
+  /**
+   * @param pattern the regex string to look for
+   * @return a match if the [currentLine] follows the pattern at the [position]. Null if not.
+   */
   private infix fun Position.pointsAt(pattern: Regex?): MatchResult? {
     return pattern
       ?.find(currentLine, startIndex = this.col)
@@ -253,10 +260,18 @@ class Lexer(
       }
   }
 
+  /**
+   * @param list a list of strings to search which is being pointed at
+   * @return the string from the list that [currentLine] is being pointed at. Null if not.
+   */
   private infix fun Position.pointsAtSome(list: Iterable<String>): String? {
     return list.find { this.pointsAt(it) }
   }
 
+  /**
+   * @param pattern the string to look for
+   * @return true if the [currentLine] follows the [pattern] at the [position].
+   */
   private infix fun Position.pointsAt(pattern: String): Boolean {
     return currentLine.startsWith(pattern, startIndex = this.col)
   }
