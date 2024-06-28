@@ -1,12 +1,13 @@
 package io.github.cybercodernaj.parkour.lexer
 
 import io.github.cybercodernaj.parkour.datasource.StringSource
+import io.github.cybercodernaj.parkour.testutils.assertTokens
 import io.github.cybercodernaj.parkour.utils.Position
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class LexerLiteralTest {
-  private val lexer = Lexer()
+  private val lexer = Lexer(hardKeywords = setOf("char"), operators = setOf("="))
 
   @Test
   fun `returns an int number`() {
@@ -63,5 +64,20 @@ class LexerLiteralTest {
 
     val token = lexer.nextToken()
     assertEquals(Token.Literal.FloatLiteral(1.609e-19, Position(0, 0), Position(0, 13)), token)
+  }
+
+  @Test
+  fun `returns character literals`() {
+    lexer.source = StringSource("char c = \'a\'")
+
+    assertTokens(
+      lexer,
+      listOf(
+        Token.Keyword("char", Position(0, 0), Position(0, 3)),
+        Token.Identifier("c", Position(0, 5), Position(0, 5)),
+        Token.Operator("=", Position(0, 7), Position(0, 7)),
+        Token.Literal.StringLiteral("\'a\'", Position(0, 9), Position(0, 11))
+      )
+    )
   }
 }

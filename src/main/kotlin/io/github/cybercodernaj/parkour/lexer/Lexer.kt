@@ -181,11 +181,18 @@ class Lexer(
           } ?: throw LexicalException("Int regex is badly formed. Tried parsing ${match.value} to an integer")
       }
 
-    if (position pointsAt literals.stringEnclosure) {
-      do {
+    val stringStart = position pointsAtSome literals.singleLineString
+    if (stringStart != null) {
+      val stringLit = StringBuilder().append(currentLine[position.col])
+      val start = position++
+      while (currentLine[position.col].toString() != stringStart) {
+        if (position.col >= currentLine.length)
+          throw LexicalException("String not closed in the given line")
+        stringLit.append(currentLine[position.col])
         position++
-        // TODO Collect string contents with escape sequences
-      } while (!(position pointsAt literals.stringEnclosure))
+      }
+      stringLit.append(currentLine[position.col])
+      return Token.Literal.StringLiteral(stringLit.toString(), start, position)
     }
 
     return null
@@ -246,7 +253,7 @@ class Lexer(
       }
   }
 
-  private infix fun Position.pointsAtSome(list: List<String>): String? {
+  private infix fun Position.pointsAtSome(list: Iterable<String>): String? {
     return list.find { this.pointsAt(it) }
   }
 
