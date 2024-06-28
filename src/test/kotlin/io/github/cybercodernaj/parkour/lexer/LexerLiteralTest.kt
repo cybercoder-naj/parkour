@@ -56,4 +56,12 @@ class LexerLiteralTest {
     val token = lexer.nextToken()
     assertEquals(Token.Literal.FloatLiteral(1.609e-19, Position(0, 0), Position(0, 8)), token)
   }
+
+  @Test
+  fun `returns floating point with underscores`() {
+    lexer.source = StringSource("1.6__0_9e-1__9")
+
+    val token = lexer.nextToken()
+    assertEquals(Token.Literal.FloatLiteral(1.609e-19, Position(0, 0), Position(0, 13)), token)
+  }
 }
