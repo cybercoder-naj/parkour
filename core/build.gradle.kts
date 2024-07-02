@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "io.github.cybercoder-naj"
-version = "0.1.0"
+version = libs.versions.lib.get()
 
 repositories {
   mavenCentral()
