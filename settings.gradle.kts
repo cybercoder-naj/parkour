@@ -9,3 +9,4 @@ plugins {
  */
 
 rootProject.name = "parkour"
+include("core")

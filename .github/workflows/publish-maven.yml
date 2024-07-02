@@ -16,14 +16,14 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Generate docs
-        run: ./gradlew :dokkaHtml
+        run: ./gradlew :dokkaHtmlMultiModule
 
       - name: Bundle Docs
         uses: actions/upload-pages-artifact@v1
         with:
           path: "./docs"
 
-  publish-package:
+  publish-core:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,7 +34,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Publish package
-        run: ./gradlew :publish
+        run: ./gradlew :core:publish
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_PASSWORD }}
@@ -42,7 +42,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
 
   deploy-docs:
-    needs: [generate-docs, publish-package]
+    needs: [generate-docs, publish-core]
 
     permissions:
       pages: write
