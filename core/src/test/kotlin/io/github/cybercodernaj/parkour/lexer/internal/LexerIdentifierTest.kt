@@ -1,9 +1,7 @@
-package io.github.cybercodernaj.parkour.lexer
+package io.github.cybercodernaj.parkour.lexer.internal
 
 import io.github.cybercodernaj.parkour.datasource.StringSource
 import io.github.cybercodernaj.parkour.exceptions.LexicalException
-import io.github.cybercodernaj.parkour.lexer.internal.Lexer
-import io.github.cybercodernaj.parkour.lexer.internal.Token
 import io.github.cybercodernaj.parkour.utils.Position
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
