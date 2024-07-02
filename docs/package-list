@@ -1,0 +1,6 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+
+module:parkour
+io.github.cybercodernaj.parkour.exceptions
+io.github.cybercodernaj.parkour.lexer
