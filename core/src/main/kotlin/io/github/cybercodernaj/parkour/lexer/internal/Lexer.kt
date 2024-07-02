@@ -31,15 +31,24 @@ import io.github.cybercodernaj.parkour.utils.Position
  * @since 0.1.0
  */
 class Lexer internal constructor(
-  private val ignorePattern: Regex = Regex("""\s+"""),
+  private val ignorePattern: Regex = Defaults.ignorePattern,
   private val singleLineComments: Regex? = null,
   private val multilineComments: Pair<Regex, Regex>? = null,
-  private val identifiers: Regex = Regex("""[a-zA-Z_]\w*"""),
+  private val identifiers: Regex = Defaults.identifiers,
   private val hardKeywords: Set<String> = emptySet(),
   private val operators: Set<String> = emptySet(),
   private val separators: Set<String> = emptySet(),
   private val literals: Literals = Literals()
 ) {
+  object Defaults {
+    val ignorePattern = Regex("""\s+""")
+    val identifiers = Regex("""[a-zA-Z_]\w*""")
+    val integerLiterals = Regex("""[-+]?[0-9_]+""")
+    val floatingLiterals = Regex("""[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?""")
+    val singleLineString: Set<String> = setOf("\"", "\'")
+    val escapeSequences: List<Pair<Regex, (String) -> Char>> = emptyList() // TODO fill this list
+  }
+
   private var position = Position(0, 0)
 
   internal lateinit var source: TextSource

@@ -2,6 +2,9 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="17">
+      <module name="parkour.parkour-json" target="21" />
+      <module name="parkour.parkour-json.main" target="21" />
+      <module name="parkour.parkour-json.test" target="21" />
       <module name="Parkour.sample" target="18" />
       <module name="Parkour.sample.main" target="18" />
       <module name="Parkour.sample.test" target="18" />

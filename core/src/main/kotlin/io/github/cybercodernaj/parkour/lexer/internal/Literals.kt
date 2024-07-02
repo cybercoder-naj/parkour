@@ -22,8 +22,8 @@ import io.github.cybercodernaj.parkour.exceptions.LexicalException
  * @since 0.1.0
  */
 class Literals internal constructor(
-  internal val integerLiteral: Regex? = Regex("""[-+]?[0-9_]+"""),
-  internal val floatingLiteral: Regex? = Regex("""[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?"""),
-  internal val singleLineString: Set<String> = setOf("\"", "\'"),
-  internal val escapeSequences: List<Pair<Regex, (String) -> Char>> = emptyList(),
+  internal val integerLiteral: Regex? = Lexer.Defaults.integerLiterals,
+  internal val floatingLiteral: Regex? = Lexer.Defaults.floatingLiterals,
+  internal val singleLineString: Set<String> = Lexer.Defaults.singleLineString,
+  internal val escapeSequences: List<Pair<Regex, (String) -> Char>> = Lexer.Defaults.escapeSequences,
 )

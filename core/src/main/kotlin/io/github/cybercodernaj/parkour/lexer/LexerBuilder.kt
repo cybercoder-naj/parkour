@@ -11,6 +11,7 @@ import io.github.cybercodernaj.parkour.lexer.internal.Lexer
  */
 class LexerBuilder internal constructor() {
   internal var ignorePattern: Regex = Regex("""\s+""")
+    private set
 
   /**
    * ignorePattern is what the lexer will use to skip over.
