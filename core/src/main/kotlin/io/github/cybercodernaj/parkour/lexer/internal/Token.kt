@@ -1,4 +1,4 @@
-package io.github.cybercodernaj.parkour.lexer
+package io.github.cybercodernaj.parkour.lexer.internal
 
 import io.github.cybercodernaj.parkour.utils.Position
 
@@ -25,8 +25,6 @@ internal sealed class Token(open val value: Any?, open val start: Position?, ope
     class IntLiteral(override val value: Long, start: Position, end: Position) : Literal(value, start, end)
     class FloatLiteral(override val value: Double, start: Position, end: Position) : Literal(value, start, end)
     class StringLiteral(override val value: String, start: Position, end: Position) : Literal(value, start, end)
-    class CharacterLiteral(override val value: Char, start: Position, end: Position) : Literal(value, start, end)
-    class BooleanLiteral(override val value: Boolean, start: Position, end: Position) : Literal(value, start, end)
   }
 
   data object EOF : Token(null, null, null)

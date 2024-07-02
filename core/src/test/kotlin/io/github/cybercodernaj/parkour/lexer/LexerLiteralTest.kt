@@ -2,6 +2,9 @@ package io.github.cybercodernaj.parkour.lexer
 
 import io.github.cybercodernaj.parkour.datasource.StringSource
 import io.github.cybercodernaj.parkour.exceptions.LexicalException
+import io.github.cybercodernaj.parkour.lexer.internal.Lexer
+import io.github.cybercodernaj.parkour.lexer.internal.Literals
+import io.github.cybercodernaj.parkour.lexer.internal.Token
 import io.github.cybercodernaj.parkour.testutils.assertTokens
 import io.github.cybercodernaj.parkour.utils.Position
 import org.junit.jupiter.api.Test

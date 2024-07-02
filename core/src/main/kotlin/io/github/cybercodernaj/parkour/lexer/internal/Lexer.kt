@@ -1,4 +1,4 @@
-package io.github.cybercodernaj.parkour.lexer
+package io.github.cybercodernaj.parkour.lexer.internal
 
 import io.github.cybercodernaj.parkour.datasource.TextSource
 import io.github.cybercodernaj.parkour.exceptions.LexicalException
@@ -30,7 +30,7 @@ import io.github.cybercodernaj.parkour.utils.Position
  * @author Nishant Aanjaney Jalan
  * @since 0.1.0
  */
-class Lexer(
+internal class Lexer(
   private val ignorePattern: Regex = Regex("""\s+"""),
   private val singleLineComments: Regex? = null,
   private val multilineComments: Pair<Regex, Regex>? = null,

@@ -1,4 +1,4 @@
-package io.github.cybercodernaj.parkour.lexer
+package io.github.cybercodernaj.parkour.lexer.internal
 
 import io.github.cybercodernaj.parkour.exceptions.LexicalException
 
@@ -21,7 +21,7 @@ import io.github.cybercodernaj.parkour.exceptions.LexicalException
  * @author Nishant Aanjaney Jalan
  * @since 0.1.0
  */
-class Literals(
+internal class Literals(
   internal val integerLiteral: Regex? = Regex("""[-+]?[0-9_]+"""),
   internal val floatingLiteral: Regex? = Regex("""[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?"""),
   internal val singleLineString: Set<String> = setOf("\"", "\'"),

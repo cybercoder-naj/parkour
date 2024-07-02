@@ -1,6 +1,6 @@
 package io.github.cybercodernaj.parkour.state
 
-import io.github.cybercodernaj.parkour.lexer.Lexer
+import io.github.cybercodernaj.parkour.lexer.internal.Lexer
 
 /**
  * The [ParkourState] maintains the state of the parsing state.
