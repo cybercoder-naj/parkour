@@ -164,8 +164,8 @@ class Lexer(
         match.value
           .replace("_", "")
           .toDoubleOrNull()?.let { value ->
-          return Token.Literal.FloatLiteral(value, position, end)
-        } ?: throw LexicalException("Double regex is badly formed.")
+            return Token.Literal.FloatLiteral(value, position, end)
+          } ?: throw LexicalException("Double regex is badly formed.")
       }
 
     (position pointsAt literals.integerLiteral)
@@ -185,11 +185,29 @@ class Lexer(
     if (stringStart != null) {
       val stringLit = StringBuilder().append(currentLine[position.col])
       val start = position++
+      if (position.col >= currentLine.length)
+        throw LexicalException("String not closed in the given line")
       while (currentLine[position.col].toString() != stringStart) {
+        val matches = literals.escapeSequences.mapNotNull { (regex, getEscapeChar) ->
+          val result = (position pointsAt regex) ?: return@mapNotNull null
+          result.value to getEscapeChar(result.value)
+        }
+
+        if (matches.isEmpty()) {
+          stringLit.append(currentLine[position.col])
+          position++
+        } else {
+          if (matches.size > 1) {
+            // TODO add a warning about this
+          }
+          val (escapeSequence, equivalentChar) = matches[0]
+          stringLit.append(equivalentChar)
+          println(escapeSequence)
+          position += escapeSequence.length
+        }
+
         if (position.col >= currentLine.length)
           throw LexicalException("String not closed in the given line")
-        stringLit.append(currentLine[position.col])
-        position++
       }
       stringLit.append(currentLine[position.col])
       return Token.Literal.StringLiteral(stringLit.toString(), start, position)

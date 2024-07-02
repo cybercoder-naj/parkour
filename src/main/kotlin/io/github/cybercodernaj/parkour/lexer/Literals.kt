@@ -9,5 +9,5 @@ class Literals(
   internal val integerLiteral: Regex? = Regex("""[-+]?[0-9_]+"""),
   internal val floatingLiteral: Regex? = Regex("""[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?"""),
   internal val singleLineString: Set<String> = setOf("\"", "\'"),
-  internal val escapeSequences: Map<Regex, Int> = mapOf(),
+  internal val escapeSequences: List<Pair<Regex, (String) -> Char>> = emptyList(),
 )

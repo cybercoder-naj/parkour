@@ -1,13 +1,25 @@
 package io.github.cybercodernaj.parkour.lexer
 
 import io.github.cybercodernaj.parkour.datasource.StringSource
+import io.github.cybercodernaj.parkour.exceptions.LexicalException
 import io.github.cybercodernaj.parkour.testutils.assertTokens
 import io.github.cybercodernaj.parkour.utils.Position
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class LexerLiteralTest {
-  private val lexer = Lexer(hardKeywords = setOf("char"), operators = setOf("="))
+  private val lexer = Lexer(
+    hardKeywords = setOf("char"),
+    operators = setOf("="),
+    literals = Literals(
+      escapeSequences = listOf(
+        Regex("""\\f""") to { _ -> 'f' },
+        Regex("""\\n""") to { _ -> '\n' },
+        Regex("""\\u\d{4}""") to { unicode -> unicode.substring(2).toInt(16).toChar() },
+      )
+    )
+  )
 
   @Test
   fun `returns an int number`() {
@@ -77,6 +89,56 @@ class LexerLiteralTest {
         Token.Identifier("c", Position(0, 5), Position(0, 5)),
         Token.Operator("=", Position(0, 7), Position(0, 7)),
         Token.Literal.StringLiteral("\'a\'", Position(0, 9), Position(0, 11))
+      )
+    )
+  }
+
+  @Test
+  fun `returns string literals`() {
+    lexer.source = StringSource("char c = \"abcde\"")
+
+    assertTokens(
+      lexer,
+      listOf(
+        Token.Keyword("char", Position(0, 0), Position(0, 3)),
+        Token.Identifier("c", Position(0, 5), Position(0, 5)),
+        Token.Operator("=", Position(0, 7), Position(0, 7)),
+        Token.Literal.StringLiteral("\"abcde\"", Position(0, 9), Position(0, 15))
+      )
+    )
+  }
+
+  @Test
+  fun `throws error on unclosed strings`() {
+    lexer.source = StringSource("char c = \"abcde \n hi")
+
+//    assertTokens(
+//      lexer,
+//      listOf(
+//        Token.Keyword("char", Position(0, 0), Position(0, 3)),
+//        Token.Identifier("c", Position(0, 5), Position(0, 5)),
+//        Token.Operator("=", Position(0, 7), Position(0, 7)),
+//      )
+//    )
+
+    try {
+      lexer.nextToken()
+      fail("Should have returned an error")
+    } catch (e: LexicalException) {
+
+    }
+  }
+
+  @Test
+  fun `returns escaped characters`() {
+    lexer.source = StringSource("'\\u1234' '\\n' '\\f'")
+
+    assertTokens(
+      lexer,
+      listOf(
+        Token.Literal.StringLiteral("'\u1234'", Position(0, 0), Position(0, 7)),
+        Token.Literal.StringLiteral("'\n'", Position(0, 9), Position(0, 12)),
+        Token.Literal.StringLiteral("'f'", Position(0, 14), Position(0, 17)),
       )
     )
   }
