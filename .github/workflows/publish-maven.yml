@@ -1,27 +1,11 @@
 name: Publish Package to Maven Registry
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Create a release
-        uses: ncipollo/release-action@v1
-        with:
-          generateReleaseNotes: true
-          prerelease: ${{ startsWith(github.ref, 'refs/tags/v0') }}
-
   generate-docs:
-    needs: create-release
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +24,6 @@ jobs:
           path: "./docs"
 
   publish-package:
-    needs: create-release
     runs-on: ubuntu-latest
 
     steps:
