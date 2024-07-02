@@ -30,7 +30,7 @@ import io.github.cybercodernaj.parkour.utils.Position
  * @author Nishant Aanjaney Jalan
  * @since 0.1.0
  */
-internal class Lexer(
+class Lexer internal constructor(
   private val ignorePattern: Regex = Regex("""\s+"""),
   private val singleLineComments: Regex? = null,
   private val multilineComments: Pair<Regex, Regex>? = null,
