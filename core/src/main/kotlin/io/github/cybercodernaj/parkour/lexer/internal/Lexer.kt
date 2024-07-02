@@ -202,7 +202,6 @@ class Lexer internal constructor(
           }
           val (escapeSequence, equivalentChar) = matches[0]
           stringLit.append(equivalentChar)
-          println(escapeSequence)
           position += escapeSequence.length
         }
 
