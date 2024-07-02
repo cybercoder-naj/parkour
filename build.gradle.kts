@@ -36,8 +36,7 @@ subprojects {
 }
 
 tasks.dokkaHtmlMultiModule {
-  val projectName = project.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-  moduleName.set(projectName)
+  moduleName.set("Parkour")
   outputDirectory.set(docsDir)
   moduleVersion.set(project.version.toString())
 }

@@ -54,7 +54,7 @@ mavenPublishing {
 
   signAllPublications()
 
-  coordinates(project.group.toString(), project.name, project.version.toString())
+  coordinates(project.group.toString(), "parkour", project.version.toString())
 
   pom {
     name.set("parkour")
