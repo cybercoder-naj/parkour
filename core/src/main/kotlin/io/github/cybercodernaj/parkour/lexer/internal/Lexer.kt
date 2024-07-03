@@ -45,8 +45,8 @@ import io.github.cybercodernaj.parkour.utils.Position
  */
 class Lexer internal constructor(
   private val ignorePattern: Regex = Defaults.ignorePattern,
-  private val singleLineComments: Regex? = null,
-  private val multilineComments: Pair<Regex, Regex>? = null,
+  private val singleLineComments: Regex? = Defaults.singleLineComments,
+  private val multilineComments: Pair<Regex, Regex>? = Defaults.multilineComments,
   private val identifiers: Regex = Defaults.identifiers,
   private val hardKeywords: Set<String> = emptySet(),
   private val operators: Set<String> = emptySet(),
@@ -72,6 +72,8 @@ class Lexer internal constructor(
      * @since 0.2.0
      */
     val ignorePattern = Regex("""\s+""")
+    val singleLineComments: Regex? = null
+    val multilineComments: Pair<Regex, Regex>? = null
     val identifiers = Regex("""[a-zA-Z_]\w*""")
     val integerLiterals = Regex("""[-+]?[0-9_]+""")
     val floatingLiterals = Regex("""[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?""")

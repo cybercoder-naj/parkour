@@ -27,5 +27,37 @@ class LexerBuilderTest {
       )
     )
   }
+
+  @Test
+  fun `sets single line comments`() {
+    val myLexer = lexer {
+      singleLineComments(Regex("//"))
+    }
+
+    myLexer.source = StringSource("hi // hello\nhru")
+    assertTokens(
+      myLexer,
+      listOf(
+        Token.Identifier("hi", Position(0, 0), Position(0, 1)),
+        Token.Identifier("hru", Position(1, 0), Position(1, 2))
+      )
+    )
+  }
+
+  @Test
+  fun `sets multiline comments`() {
+    val myLexer = lexer {
+      multiLineComments(Regex("/\\*") to Regex("\\*/"))
+    }
+
+    myLexer.source = StringSource("hi /* hello */\nhru")
+    assertTokens(
+      myLexer,
+      listOf(
+        Token.Identifier("hi", Position(0, 0), Position(0, 1)),
+        Token.Identifier("hru", Position(1, 0), Position(1, 2))
+      )
+    )
+  }
 }
 
