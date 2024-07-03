@@ -2,21 +2,33 @@ package io.github.cybercodernaj.parkour.lexer.internal
 
 import io.github.cybercodernaj.parkour.datasource.TextSource
 import io.github.cybercodernaj.parkour.exceptions.LexicalException
+import io.github.cybercodernaj.parkour.lexer.LexerBuilder
 import io.github.cybercodernaj.parkour.utils.Position
 
 /**
+ * # Lexer
+ *
  * The lexer is responsible to convert the given string into a stream of [Token]s.
- * The lexer take in multiple settings that configure how it behaves.
+ * The lexer take in multiple settings via the [LexerBuilder] that configures how it behaves.
  * It will perform lexical analysis on a line-by-line basis and return the next unconsumed token.
- * A newline character is **always** separates a token.
+ * A newline character **always** separates a token unless it is a multiline comment.
+ *
+ * ## Literals
+ *
+ * There are only three types of literals the lexer manages.
+ * 1. Integer literals are normally lexed with a pure stream of numbers with underscores.
+ * 2. Floating literals are normally lexed with a forced decimal point with optional exponentiation.
+ * 3. String literals are normally lexed exact strings till it finds the original match.
+ *
+ * Additionally, escape sequences are required to input special characters inside string literals.
  *
  * @constructor Creates a lexer with the provided properties.
- * @param ignorePattern characters that satisfy this regex would be skipped. (Default: "\s+")
+ * @param ignorePattern characters that satisfy this regex would be skipped.
  * @param singleLineComments The regex that defines how a single-line comment starts.
  *    Once identified, the lexer will skip the remaining line. (Default: null)
  * @param multilineComments A pair of regexes, the starting pattern and the ending pattern for a
  *    multiline comment block. (Default: null)
- * @param identifiers A regex string that defines the rules for defining a name. (Default: "[a-zA-Z_]\w*")
+ * @param identifiers A regex string that defines the rules for defining a name.
  * @param hardKeywords A set of strings that are considered hard keywords.
  *    Hard keywords are a characters and symbols that give a particular meaning to a program.
  *    They may not be used as identifiers. (Default: [])
@@ -24,8 +36,11 @@ import io.github.cybercodernaj.parkour.utils.Position
  *    Operators are characters and symbols that may perform arithmetic or logical operations. (Default: [])
  * @param separators A set of strings that are considered as separators.
  *    Separators are characters and symbols that act like delimiters to separate other meaningful elements. (Default: [])
- * @param literals The configuration of literals. Literals denote constant values
- * such as numbers, strings, and characters. (Default: see [Literals])
+ * @param integerLiteral a regex that detects an integer literal.
+ * @param floatingLiteral a regex that detects a floating point number literal.
+ * @param singleLineString a set of strings that denote the start and end enclosing strings.
+ * The lexer will throw a [LexicalException] when a string literal is not terminated in the same line.
+ * @param escapeSequences a list of regex that matches an escape sequence. On match, it will return a Char based on the string matched.
  *
  * @author Nishant Aanjaney Jalan
  * @since 0.1.0
@@ -38,9 +53,27 @@ class Lexer internal constructor(
   private val hardKeywords: Set<String> = emptySet(),
   private val operators: Set<String> = emptySet(),
   private val separators: Set<String> = emptySet(),
-  private val literals: Literals = Literals()
+  private val integerLiteral: Regex? = Defaults.integerLiterals,
+  private val floatingLiteral: Regex? = Defaults.floatingLiterals,
+  private val singleLineString: Set<String> = Defaults.singleLineString,
+  private val escapeSequences: List<Pair<Regex, (String) -> Char>> = Defaults.escapeSequences,
 ) {
+  /**
+   * A list of common patterns and lists of items that most programming languages and
+   * data serialization formats.
+   *
+   * @author Nishant Aanjaney Jalan
+   * @since 0.2.0
+   */
   object Defaults {
+    /**
+     * ignorePattern is what the lexer will use to skip over.
+     * The part of the string that matches this regex will be ignored.
+     * This acts like a token separator.
+     *
+     * @author Nishant Aanjaney Jalan
+     * @since 0.2.0
+     */
     val ignorePattern = Regex("""\s+""")
     val identifiers = Regex("""[a-zA-Z_]\w*""")
     val integerLiterals = Regex("""[-+]?[0-9_]+""")
@@ -164,7 +197,7 @@ class Lexer internal constructor(
   }
 
   private fun tryLiterals(): Token.Literal? {
-    (position pointsAt literals.floatingLiteral)
+    (position pointsAt floatingLiteral)
       ?.let { match ->
         if (match.value.isBlank())
           return null
@@ -177,7 +210,7 @@ class Lexer internal constructor(
           } ?: throw LexicalException("Double regex is badly formed.")
       }
 
-    (position pointsAt literals.integerLiteral)
+    (position pointsAt integerLiteral)
       ?.let { match ->
         if (match.value.isBlank())
           return null
@@ -190,14 +223,14 @@ class Lexer internal constructor(
           } ?: throw LexicalException("Int regex is badly formed. Tried parsing ${match.value} to an integer")
       }
 
-    val stringStart = position pointsAtSome literals.singleLineString
+    val stringStart = position pointsAtSome singleLineString
     if (stringStart != null) {
       val stringLit = StringBuilder().append(currentLine[position.col])
       val start = position++
       if (position.col >= currentLine.length)
         throw LexicalException("String not closed in the given line")
       while (currentLine[position.col].toString() != stringStart) {
-        val matches = literals.escapeSequences.mapNotNull { (regex, getEscapeChar) ->
+        val matches = escapeSequences.mapNotNull { (regex, getEscapeChar) ->
           val result = (position pointsAt regex) ?: return@mapNotNull null
           result.value to getEscapeChar(result.value)
         }

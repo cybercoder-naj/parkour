@@ -12,12 +12,10 @@ class LexerLiteralTest {
   private val lexer = Lexer(
     hardKeywords = setOf("char"),
     operators = setOf("="),
-    literals = Literals(
-      escapeSequences = listOf(
-        Regex("""\\f""") to { _ -> 'f' },
-        Regex("""\\n""") to { _ -> '\n' },
-        Regex("""\\u\d{4}""") to { unicode -> unicode.substring(2).toInt(16).toChar() },
-      )
+    escapeSequences = listOf(
+      Regex("""\\f""") to { _ -> 'f' },
+      Regex("""\\n""") to { _ -> '\n' },
+      Regex("""\\u\d{4}""") to { unicode -> unicode.substring(2).toInt(16).toChar() },
     )
   )
 

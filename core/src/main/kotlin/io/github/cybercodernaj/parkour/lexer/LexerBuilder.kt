@@ -4,22 +4,24 @@ import io.github.cybercodernaj.parkour.lexer.internal.Lexer
 
 /**
  * A helper class to create the [Lexer].
- * Contains functions to be used as part of the [lexer] dsl.
+ * Contains functions to be used as part of the [lexer] DSL.
+ * Each property's default value is detailed in [Lexer.Defaults].
  *
  * @author Nishant Aanjaney Jalan
  * @since 0.2.0
  */
 class LexerBuilder internal constructor() {
-  internal var ignorePattern: Regex = Regex("""\s+""")
+  internal var ignorePattern: Regex = Lexer.Defaults.ignorePattern
     private set
 
   /**
    * ignorePattern is what the lexer will use to skip over.
    * The part of the string that matches this regex will be ignored.
-   * This acts like a token separator, defaulted to "\s+" regex.
+   * This acts like a token separator.
    *
    * @param regex regex of the pattern the lexer will not tokenize.
    *
+   * @see Lexer.Defaults.ignorePattern
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
@@ -29,7 +31,7 @@ class LexerBuilder internal constructor() {
 }
 
 /**
- * Build a lexer in a DSL type language.
+ * Build a lexer in a DSL.
  * Accepts a function with [LexerBuilder] as a receiver and returns a lexer of that configuration.
  *
  * @param init the execution block in context of [LexerBuilder]
