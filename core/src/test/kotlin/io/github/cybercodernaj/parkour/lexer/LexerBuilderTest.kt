@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 class LexerBuilderTest {
   @Test
   fun `initialise a default lexer`() {
-    val myLexer = lexer {}
+    lexer {}
   }
 
   @Test
@@ -56,6 +56,22 @@ class LexerBuilderTest {
       listOf(
         Token.Identifier("hi", Position(0, 0), Position(0, 1)),
         Token.Identifier("hru", Position(1, 0), Position(1, 2))
+      )
+    )
+  }
+
+  @Test
+  fun `sets identifiers rule`() {
+    val myLexer = lexer {
+      identifiers(Regex("[a-z][a-zA-Z0-9]+"))
+    }
+
+    myLexer.source = StringSource("hi value")
+    assertTokens(
+      myLexer,
+      listOf(
+        Token.Identifier("hi", Position(0, 0), Position(0, 1)),
+        Token.Identifier("value", Position(0, 3), Position(0, 7))
       )
     )
   }
