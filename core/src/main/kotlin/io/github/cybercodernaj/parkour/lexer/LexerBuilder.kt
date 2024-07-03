@@ -72,9 +72,9 @@ class LexerBuilder internal constructor() {
    * }
    * ```
    *
-   * @param singleLineComments regex of the pattern the lexer will skip over to the next line.
+   * @param multilineComments regex of the pattern the lexer will skip over to the next line.
    *
-   * @see Lexer.Defaults.singleLineComments
+   * @see Lexer.Defaults.multilineComments
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
