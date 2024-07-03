@@ -6,14 +6,12 @@ import io.github.cybercodernaj.parkour.lexer.LexerBuilder
 import io.github.cybercodernaj.parkour.utils.Position
 
 /**
- * # Lexer
- *
  * The lexer is responsible to convert the given string into a stream of [Token]s.
  * The lexer take in multiple settings via the [LexerBuilder] that configures how it behaves.
  * It will perform lexical analysis on a line-by-line basis and return the next unconsumed token.
  * A newline character **always** separates a token unless it is a multiline comment.
  *
- * ## Literals
+ * ### Literals
  *
  * There are only three types of literals the lexer manages.
  * 1. Integer literals are normally lexed with a pure stream of numbers with underscores.
@@ -67,8 +65,7 @@ class Lexer internal constructor(
    */
   object Defaults {
     /**
-     * ignorePattern is what the lexer will use to skip over.
-     * The part of the string that matches this regex will be ignored.
+     * The lexer will skip over any strings that match this regex.
      * This acts like a token separator.
      *
      * @author Nishant Aanjaney Jalan

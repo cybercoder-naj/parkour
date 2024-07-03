@@ -15,8 +15,7 @@ class LexerBuilder internal constructor() {
     private set
 
   /**
-   * ignorePattern is what the lexer will use to skip over.
-   * The part of the string that matches this regex will be ignored.
+   * The lexer will skip over any strings that match this regex.
    * This acts like a token separator.
    *
    * @param regex regex of the pattern the lexer will not tokenize.
@@ -33,6 +32,14 @@ class LexerBuilder internal constructor() {
 /**
  * Build a lexer in a DSL.
  * Accepts a function with [LexerBuilder] as a receiver and returns a lexer of that configuration.
+ *
+ * ### Sample
+ *
+ * ```kotlin
+ * val myLexer = lexer {
+ *   /* Add your lexer configuration here. */
+ * }
+ * ```
  *
  * @param init the execution block in context of [LexerBuilder]
  * @return the configured Lexer to be used in the parser.
