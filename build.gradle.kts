@@ -11,8 +11,12 @@ plugins {
 group = "io.github.cybercoder-naj"
 version = libs.versions.lib.get()
 
-extra["docsDir"] = layout.projectDirectory.dir("docs/")
-val docsDir = extra["docsDir"] as Directory
+val docsDir = layout.projectDirectory.dir("docs/")
+val dokkaPluginConfig = """
+    {
+      "footerMessage": "© 2024 Nishant Aanjaney Jalan"
+    } 
+  """
 
 buildscript {
   dependencies {
@@ -27,8 +31,6 @@ allprojects {
 }
 
 subprojects {
-  extra["docsDir"] = rootProject.extra["docsDir"]
-
   apply(plugin = "org.jetbrains.dokka")
   tasks.withType<DokkaTaskPartial>().configureEach {
     dokkaSourceSets.configureEach {
@@ -38,6 +40,12 @@ subprojects {
         remoteLineSuffix.set("#L")
       }
     }
+
+    pluginsMapConfiguration.set(
+      mapOf(
+        "org.jetbrains.dokka.base.DokkaBase" to dokkaPluginConfig
+      )
+    )
   }
 }
 
@@ -48,14 +56,9 @@ tasks.dokkaHtmlMultiModule {
 }
 
 tasks.withType<DokkaMultiModuleTask>().configureEach {
-  val config = """
-    {
-      "footerMessage": "© 2024 Nishant Aanjaney Jalan"
-    } 
-  """
   pluginsMapConfiguration.set(
     mapOf(
-      "org.jetbrains.dokka.base.DokkaBase" to config
+      "org.jetbrains.dokka.base.DokkaBase" to dokkaPluginConfig
     )
   )
 }
