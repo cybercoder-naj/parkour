@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class LexerKeywordTest {
-  private val lexer = Lexer(hardKeywords = setOf("val", "var", "class"))
+  private val lexer = Lexer(hardKeywords = listOf("class", "val", "var"))
 
   @Test
   fun `returns a keyword`() {

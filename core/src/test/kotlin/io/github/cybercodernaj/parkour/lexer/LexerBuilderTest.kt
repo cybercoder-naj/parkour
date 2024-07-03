@@ -75,5 +75,21 @@ class LexerBuilderTest {
       )
     )
   }
+
+  @Test
+  fun `sets hard keywords`() {
+    val myLexer = lexer {
+      hardKeywords("val", "var")
+    }
+
+    myLexer.source = StringSource("val c")
+    assertTokens(
+      myLexer,
+      listOf(
+        Token.Keyword("val", Position(0, 0), Position(0, 2)),
+        Token.Identifier("c", Position(0, 4), Position(0, 4)),
+      )
+    )
+  }
 }
 

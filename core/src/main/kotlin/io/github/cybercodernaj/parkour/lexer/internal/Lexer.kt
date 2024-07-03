@@ -48,7 +48,7 @@ class Lexer internal constructor(
   private val singleLineComments: Regex? = Defaults.singleLineComments,
   private val multilineComments: Pair<Regex, Regex>? = Defaults.multilineComments,
   private val identifiers: Regex = Defaults.identifiers,
-  private val hardKeywords: Set<String> = emptySet(),
+  private val hardKeywords: List<String> = emptyList(),
   private val operators: Set<String> = emptySet(),
   private val separators: Set<String> = emptySet(),
   private val integerLiteral: Regex? = Defaults.integerLiterals,
@@ -94,7 +94,6 @@ class Lexer internal constructor(
 
   private var insideMultilineComment = false
 
-  private val _hardKeywords = hardKeywords.sortedByDescending(String::length)
   private val _separators = separators.sortedByDescending(String::length)
   private val _operators = operators.sortedByDescending(String::length)
 
@@ -153,7 +152,7 @@ class Lexer internal constructor(
           position = position.copy(col = match.range.last + 1)
         }
 
-      (position pointsAtSome _hardKeywords)
+      (position pointsAtSome hardKeywords)
         ?.let { keyword ->
           val end = position.copy(col = position.col + keyword.length - 1)
           tokenStream.addHardKeyword(position, end)

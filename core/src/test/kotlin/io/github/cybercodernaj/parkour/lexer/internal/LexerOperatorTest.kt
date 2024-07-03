@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 
 class LexerOperatorTest {
   private val lexer = Lexer(
-    hardKeywords = setOf("val", "var"),
+    hardKeywords = listOf("val", "var"),
     operators = setOf("*", "**", "/", "//", "+", "-", "=", "==")
   )
 

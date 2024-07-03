@@ -23,6 +23,9 @@ class LexerBuilder internal constructor() {
   internal var identifiers: Regex = Lexer.Defaults.identifiers
     private set
 
+  private val _hardKeywords: MutableList<String> = mutableListOf()
+  internal val hardKeywords: List<String> get() = _hardKeywords
+
   /**
    * The lexer will skip over any strings that match this regex.
    * This acts like a token separator.
@@ -107,12 +110,33 @@ class LexerBuilder internal constructor() {
    *
    * @param identifiers regex defining the rules of the naming identifiers
    *
-   * @see Lexer.Defaults.multilineComments
+   * @see Lexer.Defaults.identifiers
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
   fun identifiers(identifiers: Regex) {
     this.identifiers = identifiers
+  }
+
+  /**
+   * Hard keywords are a characters and symbols that give a particular meaning to a program.
+   * They may not be used as identifiers.
+   * (Default: [])
+   *
+   * ### Usage
+   *
+   * ```kt
+   * val myLexer = lexer {
+   *   hardKeywords("class", "this", "fun", "keywords")
+   * }
+   * ```
+   *
+   * @param keywords a variable number of hard keywords
+   * @author Nishant Aanjaney Jalan
+   * @since 0.2.0
+   */
+  fun hardKeywords(vararg keywords: String) {
+    this._hardKeywords.addAll(keywords)
   }
 }
 
@@ -142,6 +166,7 @@ fun lexer(init: LexerBuilder.() -> Unit): Lexer {
     ignorePattern = builder.ignorePattern,
     singleLineComments = builder.singleLineComments,
     multilineComments = builder.multilineComments,
-    identifiers = builder.identifiers
+    identifiers = builder.identifiers,
+    hardKeywords = builder.hardKeywords.sortedByDescending(String::length)
   )
 }
