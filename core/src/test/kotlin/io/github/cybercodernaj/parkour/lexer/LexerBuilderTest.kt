@@ -91,5 +91,76 @@ class LexerBuilderTest {
       )
     )
   }
+
+  @Test
+  fun `set separators`() {
+    val myLexer = lexer {
+      separators("(", ")", "<", ">", ",", ".")
+    }
+
+
+    myLexer.source = StringSource("Array<List<Set<Int>>>")
+
+    assertTokens(
+      myLexer, listOf(
+        Token.Identifier("Array", start = Position(0, 0), end = Position(0, 4)),
+        Token.Separator("<", start = Position(0, 5), end = Position(0, 5)),
+        Token.Identifier("List", start = Position(0, 6), end = Position(0, 9)),
+        Token.Separator("<", start = Position(0, 10), end = Position(0, 10)),
+        Token.Identifier("Set", start = Position(0, 11), end = Position(0, 13)),
+        Token.Separator("<", start = Position(0, 14), end = Position(0, 14)),
+        Token.Identifier("Int", start = Position(0, 15), end = Position(0, 17)),
+        Token.Separator(">", start = Position(0, 18), end = Position(0, 18)),
+        Token.Separator(">", start = Position(0, 19), end = Position(0, 19)),
+        Token.Separator(">", start = Position(0, 20), end = Position(0, 20)),
+      )
+    )
+  }
+
+  @Test
+  fun `set operators`() {
+    val myLexer = lexer {
+      hardKeywords("val")
+      operators("*", "**", "/", "//", "+", "-", "=", "==")
+    }
+
+    myLexer.source = StringSource("val diff = new - old")
+
+    assertTokens(
+      myLexer, listOf(
+        Token.Keyword(
+          value = "val",
+          start = Position(0, 0),
+          end = Position(0, 2),
+          soft = false
+        ),
+        Token.Identifier(
+          value = "diff",
+          start = Position(0, 4),
+          end = Position(0, 7)
+        ),
+        Token.Operator(
+          value = "=",
+          start = Position(0, 9),
+          end = Position(0, 9)
+        ),
+        Token.Identifier(
+          value = "new",
+          start = Position(0, 11),
+          end = Position(0, 13)
+        ),
+        Token.Operator(
+          value = "-",
+          start = Position(0, 15),
+          end = Position(0, 15)
+        ),
+        Token.Identifier(
+          value = "old",
+          start = Position(0, 17),
+          end = Position(0, 19)
+        )
+      )
+    )
+  }
 }
 

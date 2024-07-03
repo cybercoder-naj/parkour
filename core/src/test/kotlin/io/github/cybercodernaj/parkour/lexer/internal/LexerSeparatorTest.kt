@@ -6,7 +6,7 @@ import io.github.cybercodernaj.parkour.utils.Position
 import org.junit.jupiter.api.Test
 
 class LexerSeparatorTest {
-  private val lexer = Lexer(separators = setOf("(", ")", "<", ">", ",", "."))
+  private val lexer = Lexer(separators = listOf("(", ")", "<", ">", ",", "."))
 
   @Test
   fun `returns a series of valid tokens`() {

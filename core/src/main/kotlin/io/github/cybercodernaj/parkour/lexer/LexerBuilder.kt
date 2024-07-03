@@ -26,6 +26,12 @@ class LexerBuilder internal constructor() {
   private val _hardKeywords: MutableList<String> = mutableListOf()
   internal val hardKeywords: List<String> get() = _hardKeywords
 
+  private val _separators: MutableList<String> = mutableListOf()
+  internal val separators: List<String> get() = _separators
+
+  private val _operators: MutableList<String> = mutableListOf()
+  internal val operators: List<String> get() = _operators
+
   /**
    * The lexer will skip over any strings that match this regex.
    * This acts like a token separator.
@@ -138,6 +144,44 @@ class LexerBuilder internal constructor() {
   fun hardKeywords(vararg keywords: String) {
     this._hardKeywords.addAll(keywords)
   }
+
+  /**
+   * Separators are characters and symbols that act like delimiters to separate other meaningful elements. (Default: [])
+   *
+   * ### Usage
+   *
+   * ```kt
+   * val myLexer = lexer {
+   *   separators(":", ",", "(", ")")
+   * }
+   * ```
+   *
+   * @param separators a variable number of separators
+   * @author Nishant Aanjaney Jalan
+   * @since 0.2.0
+   */
+  fun separators(vararg separators: String) {
+    this._separators.addAll(separators)
+  }
+
+  /**
+   * Operators are characters and symbols that may perform arithmetic or logical operations. (Default: [])
+   *
+   * ### Usage
+   *
+   * ```kt
+   * val myLexer = lexer {
+   *   operators("+", "-", "||", "<=")
+   * }
+   * ```
+   *
+   * @param operators a variable number of operators
+   * @author Nishant Aanjaney Jalan
+   * @since 0.2.0
+   */
+  fun operators(vararg operators: String) {
+    this._operators.addAll(operators)
+  }
 }
 
 /**
@@ -167,6 +211,8 @@ fun lexer(init: LexerBuilder.() -> Unit): Lexer {
     singleLineComments = builder.singleLineComments,
     multilineComments = builder.multilineComments,
     identifiers = builder.identifiers,
-    hardKeywords = builder.hardKeywords.sortedByDescending(String::length)
+    hardKeywords = builder.hardKeywords.sortedByDescending(String::length),
+    operators = builder.operators.sortedByDescending(String::length),
+    separators = builder.separators.sortedByDescending(String::length),
   )
 }

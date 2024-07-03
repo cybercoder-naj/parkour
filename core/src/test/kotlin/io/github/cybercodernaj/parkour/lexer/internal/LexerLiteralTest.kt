@@ -11,7 +11,7 @@ import kotlin.test.fail
 class LexerLiteralTest {
   private val lexer = Lexer(
     hardKeywords = listOf("char"),
-    operators = setOf("="),
+    operators = listOf("="),
     escapeSequences = listOf(
       Regex("""\\f""") to { _ -> 'f' },
       Regex("""\\n""") to { _ -> '\n' },
