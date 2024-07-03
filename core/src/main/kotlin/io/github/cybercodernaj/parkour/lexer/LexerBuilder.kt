@@ -68,7 +68,7 @@ class LexerBuilder internal constructor() {
    * ```kt
    * val myLexer = lexer {
    *   // You don't need the square brackets but KDoc doesn't like it...
-   *   multiLineComments(Regex("[/][*]") to Regex("[*][/]"))
+   *   multilineComments(Regex("[/][*]") to Regex("[*][/]"))
    * }
    * ```
    *
@@ -78,7 +78,7 @@ class LexerBuilder internal constructor() {
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  fun multiLineComments(multilineComments: Pair<Regex, Regex>) {
+  fun multilineComments(multilineComments: Pair<Regex, Regex>) {
     this.multilineComments = multilineComments
   }
 }

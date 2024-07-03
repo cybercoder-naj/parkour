@@ -47,7 +47,7 @@ class LexerBuilderTest {
   @Test
   fun `sets multiline comments`() {
     val myLexer = lexer {
-      multiLineComments(Regex("/\\*") to Regex("\\*/"))
+      multilineComments(Regex("/\\*") to Regex("\\*/"))
     }
 
     myLexer.source = StringSource("hi /* hello */\nhru")
