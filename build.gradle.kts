@@ -1,6 +1,6 @@
+import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import java.net.URI
-import java.util.*
 
 plugins {
   kotlin("jvm") version "2.0.0"
@@ -13,6 +13,12 @@ version = libs.versions.lib.get()
 
 extra["docsDir"] = layout.projectDirectory.dir("docs/")
 val docsDir = extra["docsDir"] as Directory
+
+buildscript {
+  dependencies {
+    classpath(libs.dokka.base)
+  }
+}
 
 allprojects {
   repositories {
@@ -39,6 +45,19 @@ tasks.dokkaHtmlMultiModule {
   moduleName.set("Parkour")
   outputDirectory.set(docsDir)
   moduleVersion.set(project.version.toString())
+}
+
+tasks.withType<DokkaMultiModuleTask>().configureEach {
+  val config = """
+    {
+      "footerMessage": "© 2024 Nishant Aanjaney Jalan"
+    } 
+  """
+  pluginsMapConfiguration.set(
+    mapOf(
+      "org.jetbrains.dokka.base.DokkaBase" to config
+    )
+  )
 }
 
 tasks.clean {

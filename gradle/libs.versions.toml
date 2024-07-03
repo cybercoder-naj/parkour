@@ -5,6 +5,9 @@ lib = "0.1.0"
 dokkaVer = "1.9.20"
 mavenPublishingVer = "0.28.0"
 
+[libraries]
+dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokkaVer" }
+
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokkaVer" }
 maven-publishing = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublishingVer" }
