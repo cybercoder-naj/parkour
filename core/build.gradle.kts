@@ -33,9 +33,6 @@ kotlin {
 tasks.withType<DokkaTaskPartial>().configureEach {
   dokkaSourceSets.configureEach {
     moduleName.set("parkour")
-    includes.from(fileTree(projectDir) {
-      include("**/docs.md")
-    })
   }
 }
 

@@ -39,6 +39,9 @@ subprojects {
         remoteUrl.set(URI.create("https://github.com/cybercoder-naj/parkour/tree/main/${project.name}/src").toURL())
         remoteLineSuffix.set("#L")
       }
+      includes.from(fileTree(projectDir) {
+        include("**/docs.md")
+      })
     }
 
     pluginsMapConfiguration.set(
