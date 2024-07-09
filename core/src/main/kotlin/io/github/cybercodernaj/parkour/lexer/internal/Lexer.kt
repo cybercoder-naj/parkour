@@ -6,39 +6,7 @@ import io.github.cybercodernaj.parkour.lexer.LexerBuilder
 import io.github.cybercodernaj.parkour.utils.Position
 
 /**
- * The lexer is responsible to convert the given string into a stream of [Token]s.
- * The lexer take in multiple settings via the [LexerBuilder] that configures how it behaves.
- * It will perform lexical analysis on a line-by-line basis and return the next unconsumed token.
- * A newline character **always** separates a token unless it is a multiline comment.
- *
- * ### Literals
- *
- * There are only three types of literals the lexer manages.
- * 1. Integer literals are normally lexed with a pure stream of numbers with underscores.
- * 2. Floating literals are normally lexed with a forced decimal point with optional exponentiation.
- * 3. String literals are normally lexed exact strings till it finds the original match.
- *
- * Additionally, escape sequences are required to input special characters inside string literals.
- *
- * @constructor Creates a lexer with the provided properties.
- * @param ignorePattern characters that satisfy this regex would be skipped.
- * @param singleLineComments The regex that defines how a single-line comment starts.
- *    Once identified, the lexer will skip the remaining line. (Default: null)
- * @param multilineComments A pair of regexes, the starting pattern and the ending pattern for a
- *    multiline comment block. (Default: null)
- * @param identifiers A regex string that defines the rules for defining a name.
- * @param hardKeywords A set of strings that are considered hard keywords.
- *    Hard keywords are a characters and symbols that give a particular meaning to a program.
- *    They may not be used as identifiers. (Default: [])
- * @param operators A set of strings that are considered as operators.
- *    Operators are characters and symbols that may perform arithmetic or logical operations. (Default: [])
- * @param separators A set of strings that are considered as separators.
- *    Separators are characters and symbols that act like delimiters to separate other meaningful elements. (Default: [])
- * @param integerLiteral a regex that detects an integer literal.
- * @param floatingLiteral a regex that detects a floating point number literal.
- * @param singleLineString a set of strings that denote the start and end enclosing strings.
- * The lexer will throw a [LexicalException] when a string literal is not terminated in the same line.
- * @param escapeSequences a list of regex that matches an escape sequence. On match, it will return a Char based on the string matched.
+ * This class is internal. You can create an instance of this class by [LexerBuilder]
  *
  * @author Nishant Aanjaney Jalan
  * @since 0.1.0

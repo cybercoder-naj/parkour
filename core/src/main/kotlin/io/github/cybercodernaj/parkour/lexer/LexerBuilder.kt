@@ -1,6 +1,7 @@
 package io.github.cybercodernaj.parkour.lexer
 
 import io.github.cybercodernaj.parkour.lexer.internal.Lexer
+import io.github.cybercodernaj.parkour.exceptions.LexicalException
 
 /**
  * A helper class to create the [Lexer].
@@ -68,7 +69,7 @@ class LexerBuilder internal constructor() {
   var multilineComments: Pair<Regex, Regex>? = Lexer.Defaults.multilineComments
 
   /**
-   * Supply the regex pattern that defines the rules for identifiers.
+   * The regex pattern that defines the rules for identifiers.
    * Identifiers are parts of the program that are named by the user;
    * for instance, the field name or class name.
    *
@@ -96,14 +97,59 @@ class LexerBuilder internal constructor() {
   private val _operators: MutableList<String> = mutableListOf()
   internal val operators: List<String> get() = _operators
 
-  internal var integerLiteral: Regex = Lexer.Defaults.integerLiteral
-    private set
+  /**
+   * The regex that detects and extracts integer literals from the string.
+   * This should usually only consider strict integers.
+   *
+   * ### Usage
+   *
+   * ```kt
+   * val myLexer = lexer {
+   *   integerLiteral = Regex("[+-]?[0-9_]+")
+   * }
+   * ```
+   *
+   * @see Lexer.Defaults.integerLiteral
+   * @author Nishant Aanjaney Jalan
+   * @since 0.2.0
+   */
+  var integerLiteral: Regex = Lexer.Defaults.integerLiteral
 
-  internal var floatingLiteral: Regex = Lexer.Defaults.floatingLiteral
-    private set
+  /**
+   * The regex that detects and extracts floating point literals from the string.
+   * This should usually only consider numbers that have a decimal point.
+   *
+   * ### Usage
+   *
+   * ```kt
+   * val myLexer = lexer {
+   *   floatingLiteral = Regex("[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?")
+   * }
+   * ```
+   *
+   * @see Lexer.Defaults.floatingLiteral
+   * @author Nishant Aanjaney Jalan
+   * @since 0.2.0
+   */
+  var floatingLiteral: Regex = Lexer.Defaults.floatingLiteral
 
-  internal var singleLineString: Set<String> = Lexer.Defaults.singleLineString
-    private set
+  /**
+   * The enclosing strings that should denote the start and end of single-line strings.
+   * The lexer will throw a [LexicalException] when a string literal is not terminated in the same line.
+   *
+   * ### Usage
+   *
+   * ```kt
+   * val myLexer = lexer {
+   *   floatingLiteral = Regex("[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?")
+   * }
+   * ```
+   *
+   * @see Lexer.Defaults.singleLineString
+   * @author Nishant Aanjaney Jalan
+   * @since 0.2.0
+   */
+  var singleLineString: Set<String> = Lexer.Defaults.singleLineString
 
   /**
    * Hard keywords are a characters and symbols that give a particular meaning to a program.
