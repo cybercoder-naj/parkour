@@ -11,27 +11,6 @@ import io.github.cybercodernaj.parkour.lexer.internal.Lexer
  * @since 0.2.0
  */
 class LexerBuilder internal constructor() {
-  internal var ignorePattern: Regex = Lexer.Defaults.ignorePattern
-    private set
-
-  internal var singleLineComments: Regex? = Lexer.Defaults.singleLineComments
-    private set
-
-  internal var multilineComments: Pair<Regex, Regex>? = Lexer.Defaults.multilineComments
-    private set
-
-  internal var identifiers: Regex = Lexer.Defaults.identifiers
-    private set
-
-  private val _hardKeywords: MutableList<String> = mutableListOf()
-  internal val hardKeywords: List<String> get() = _hardKeywords
-
-  private val _separators: MutableList<String> = mutableListOf()
-  internal val separators: List<String> get() = _separators
-
-  private val _operators: MutableList<String> = mutableListOf()
-  internal val operators: List<String> get() = _operators
-
   /**
    * The lexer will skip over any strings that match this regex.
    * This acts like a token separator.
@@ -40,19 +19,15 @@ class LexerBuilder internal constructor() {
    *
    * ```kt
    * val myLexer = lexer {
-   *   ignorePatterns(Regex("""\s+"""))
+   *   ignorePatterns = Regex("""\s+""")
    * }
    * ```
-   *
-   * @param regex regex of the pattern the lexer will not tokenize.
    *
    * @see Lexer.Defaults.ignorePattern
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  fun ignorePattern(regex: Regex) {
-    ignorePattern = regex
-  }
+  var ignorePattern: Regex = Lexer.Defaults.ignorePattern
 
   /**
    * When the lexer identifies a [singleLineComments] pattern, it will skip to the next line
@@ -62,19 +37,15 @@ class LexerBuilder internal constructor() {
    *
    * ```kt
    * val myLexer = lexer {
-   *   singleLineComments(Regex("//"))
+   *   singleLineComments = Regex("//")
    * }
    * ```
-   *
-   * @param singleLineComments regex of the pattern the lexer will skip over to the next line.
    *
    * @see Lexer.Defaults.singleLineComments
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  fun singleLineComments(singleLineComments: Regex) {
-    this.singleLineComments = singleLineComments
-  }
+  var singleLineComments: Regex? = Lexer.Defaults.singleLineComments
 
   /**
    * There are two parts to [multilineComments]: the starting and the ending pattern.
@@ -86,19 +57,15 @@ class LexerBuilder internal constructor() {
    * ```kt
    * val myLexer = lexer {
    *   // You don't need the square brackets but KDoc doesn't like it...
-   *   multilineComments(Regex("[/][*]") to Regex("[*][/]"))
+   *   multilineComments = Regex("[/][*]") to Regex("[*][/]")
    * }
    * ```
-   *
-   * @param multilineComments pair of regexes that define what contents are under comments.
    *
    * @see Lexer.Defaults.multilineComments
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  fun multilineComments(multilineComments: Pair<Regex, Regex>) {
-    this.multilineComments = multilineComments
-  }
+  var multilineComments: Pair<Regex, Regex>? = Lexer.Defaults.multilineComments
 
   /**
    * Supply the regex pattern that defines the rules for identifiers.
@@ -110,24 +77,38 @@ class LexerBuilder internal constructor() {
    * ```kt
    * val myLexer = lexer {
    *   // If all identifiers must be at least 2 characters and start with a lowercase english alphabet.
-   *   identifiers(Regex("[a-z][a-zA-Z0-9]+"))
+   *   identifiers = Regex("[a-z][a-zA-Z0-9]+")
    * }
    * ```
-   *
-   * @param identifiers regex defining the rules of the naming identifiers
    *
    * @see Lexer.Defaults.identifiers
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  fun identifiers(identifiers: Regex) {
-    this.identifiers = identifiers
-  }
+  var identifiers: Regex = Lexer.Defaults.identifiers
+
+  private val _hardKeywords: MutableList<String> = mutableListOf()
+  internal val hardKeywords: List<String> get() = _hardKeywords
+
+  private val _separators: MutableList<String> = mutableListOf()
+  internal val separators: List<String> get() = _separators
+
+  private val _operators: MutableList<String> = mutableListOf()
+  internal val operators: List<String> get() = _operators
+
+  internal var integerLiteral: Regex = Lexer.Defaults.integerLiteral
+    private set
+
+  internal var floatingLiteral: Regex = Lexer.Defaults.floatingLiteral
+    private set
+
+  internal var singleLineString: Set<String> = Lexer.Defaults.singleLineString
+    private set
 
   /**
    * Hard keywords are a characters and symbols that give a particular meaning to a program.
    * They may not be used as identifiers.
-   * (Default: [])
+   * You can add multiple keywords over many function calls.
    *
    * ### Usage
    *
@@ -146,7 +127,8 @@ class LexerBuilder internal constructor() {
   }
 
   /**
-   * Separators are characters and symbols that act like delimiters to separate other meaningful elements. (Default: [])
+   * Separators are characters and symbols that act like delimiters to separate other meaningful elements.
+   * You can add multiple separators over many function calls.
    *
    * ### Usage
    *
@@ -165,7 +147,8 @@ class LexerBuilder internal constructor() {
   }
 
   /**
-   * Operators are characters and symbols that may perform arithmetic or logical operations. (Default: [])
+   * Operators are characters and symbols that may perform arithmetic or logical operations.
+   * You can add multiple separators over many function calls.
    *
    * ### Usage
    *
@@ -214,5 +197,8 @@ fun lexer(init: LexerBuilder.() -> Unit): Lexer {
     hardKeywords = builder.hardKeywords.sortedByDescending(String::length),
     operators = builder.operators.sortedByDescending(String::length),
     separators = builder.separators.sortedByDescending(String::length),
+    integerLiteral = builder.integerLiteral,
+    floatingLiteral = builder.floatingLiteral,
+    singleLineString = builder.singleLineString,
   )
 }

@@ -15,7 +15,7 @@ class LexerBuilderTest {
   @Test
   fun `sets ignore patterns`() {
     val myLexer = lexer {
-      ignorePattern(Regex("\\."))
+      ignorePattern = Regex("\\.")
     }
 
     myLexer.source = StringSource("hi.hello")
@@ -31,7 +31,7 @@ class LexerBuilderTest {
   @Test
   fun `sets single line comments`() {
     val myLexer = lexer {
-      singleLineComments(Regex("//"))
+      singleLineComments = Regex("//")
     }
 
     myLexer.source = StringSource("hi // hello\nhru")
@@ -47,7 +47,7 @@ class LexerBuilderTest {
   @Test
   fun `sets multiline comments`() {
     val myLexer = lexer {
-      multilineComments(Regex("/\\*") to Regex("\\*/"))
+      multilineComments = Regex("/\\*") to Regex("\\*/")
     }
 
     myLexer.source = StringSource("hi /* hello */\nhru")
@@ -63,7 +63,7 @@ class LexerBuilderTest {
   @Test
   fun `sets identifiers rule`() {
     val myLexer = lexer {
-      identifiers(Regex("[a-z][a-zA-Z0-9]+"))
+      identifiers = Regex("[a-z][a-zA-Z0-9]+")
     }
 
     myLexer.source = StringSource("hi value")

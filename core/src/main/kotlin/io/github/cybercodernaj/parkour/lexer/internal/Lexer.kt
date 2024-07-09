@@ -51,8 +51,8 @@ class Lexer internal constructor(
   private val hardKeywords: List<String> = emptyList(),
   private val operators: List<String> = emptyList(),
   private val separators: List<String> = emptyList(),
-  private val integerLiteral: Regex? = Defaults.integerLiterals,
-  private val floatingLiteral: Regex? = Defaults.floatingLiterals,
+  private val integerLiteral: Regex? = Defaults.integerLiteral,
+  private val floatingLiteral: Regex? = Defaults.floatingLiteral,
   private val singleLineString: Set<String> = Defaults.singleLineString,
   private val escapeSequences: List<Pair<Regex, (String) -> Char>> = Defaults.escapeSequences,
 ) {
@@ -75,8 +75,8 @@ class Lexer internal constructor(
     val singleLineComments: Regex? = null
     val multilineComments: Pair<Regex, Regex>? = null
     val identifiers = Regex("""[a-zA-Z_]\w*""")
-    val integerLiterals = Regex("""[-+]?[0-9_]+""")
-    val floatingLiterals = Regex("""[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?""")
+    val integerLiteral = Regex("""[-+]?[0-9_]+""")
+    val floatingLiteral = Regex("""[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?""")
     val singleLineString: Set<String> = setOf("\"", "\'")
     val escapeSequences: List<Pair<Regex, (String) -> Char>> = emptyList() // TODO fill this list
   }
