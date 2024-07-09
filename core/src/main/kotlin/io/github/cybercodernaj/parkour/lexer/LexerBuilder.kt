@@ -1,12 +1,11 @@
 package io.github.cybercodernaj.parkour.lexer
 
 import io.github.cybercodernaj.parkour.lexer.internal.Lexer
-import io.github.cybercodernaj.parkour.exceptions.LexicalException
 
 /**
  * A helper class to create the [Lexer].
  * Contains functions to be used as part of the [lexer] DSL.
- * Each property's default value is detailed in [Lexer.Defaults].
+ * Each property's default value is detailed in [LexerCommons].
  *
  * @author Nishant Aanjaney Jalan
  * @since 0.2.0
@@ -24,11 +23,10 @@ class LexerBuilder internal constructor() {
    * }
    * ```
    *
-   * @see Lexer.Defaults.ignorePattern
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  var ignorePattern: Regex = Lexer.Defaults.ignorePattern
+  var ignorePattern: Regex? = null
 
   /**
    * When the lexer identifies a [singleLineComments] pattern, it will skip to the next line
@@ -42,11 +40,10 @@ class LexerBuilder internal constructor() {
    * }
    * ```
    *
-   * @see Lexer.Defaults.singleLineComments
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  var singleLineComments: Regex? = Lexer.Defaults.singleLineComments
+  var singleLineComments: Regex? = null
 
   /**
    * There are two parts to [multilineComments]: the starting and the ending pattern.
@@ -62,11 +59,10 @@ class LexerBuilder internal constructor() {
    * }
    * ```
    *
-   * @see Lexer.Defaults.multilineComments
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  var multilineComments: Pair<Regex, Regex>? = Lexer.Defaults.multilineComments
+  var multilineComments: Pair<Regex, Regex>? = null
 
   /**
    * The regex pattern that defines the rules for identifiers.
@@ -82,11 +78,11 @@ class LexerBuilder internal constructor() {
    * }
    * ```
    *
-   * @see Lexer.Defaults.identifiers
+   * @see LexerCommons.identifiers
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  var identifiers: Regex = Lexer.Defaults.identifiers
+  var identifiers: Regex? = null
 
   private val _hardKeywords: MutableList<String> = mutableListOf()
   internal val hardKeywords: List<String> get() = _hardKeywords
@@ -100,6 +96,7 @@ class LexerBuilder internal constructor() {
   /**
    * The regex that detects and extracts integer literals from the string.
    * This should usually only consider strict integers.
+   * This configuration is required only if your integer pattern is different from [LexerCommons.integerLiteral]
    *
    * ### Usage
    *
@@ -109,15 +106,16 @@ class LexerBuilder internal constructor() {
    * }
    * ```
    *
-   * @see Lexer.Defaults.integerLiteral
+   * @see LexerCommons.integerLiteral
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  var integerLiteral: Regex = Lexer.Defaults.integerLiteral
+  var integerLiteral: Regex = LexerCommons.integerLiteral
 
   /**
    * The regex that detects and extracts floating point literals from the string.
    * This should usually only consider numbers that have a decimal point.
+   * This configuration is required only if your floating pattern is different from [LexerCommons.floatingLiteral]
    *
    * ### Usage
    *
@@ -127,29 +125,30 @@ class LexerBuilder internal constructor() {
    * }
    * ```
    *
-   * @see Lexer.Defaults.floatingLiteral
+   * @see LexerCommons.floatingLiteral
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  var floatingLiteral: Regex = Lexer.Defaults.floatingLiteral
+  var floatingLiteral: Regex = LexerCommons.floatingLiteral
 
   /**
    * The enclosing strings that should denote the start and end of single-line strings.
    * The lexer will throw a [LexicalException] when a string literal is not terminated in the same line.
+   * This configuration is required only if your string defining patterns are different from [LexerCommons.floatingLiteral]
    *
    * ### Usage
    *
    * ```kt
    * val myLexer = lexer {
-   *   floatingLiteral = Regex("[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?")
+   *   singleLineString = setOf("'", "\"")
    * }
    * ```
    *
-   * @see Lexer.Defaults.singleLineString
+   * @see LexerCommons.singleLineString
    * @author Nishant Aanjaney Jalan
    * @since 0.2.0
    */
-  var singleLineString: Set<String> = Lexer.Defaults.singleLineString
+  var singleLineString: Set<String> = LexerCommons.singleLineString
 
   /**
    * Hard keywords are a characters and symbols that give a particular meaning to a program.

@@ -1,4 +1,4 @@
-package io.github.cybercodernaj.parkour.exceptions
+package io.github.cybercodernaj.parkour.lexer
 
 /**
  * This is thrown when there is an error when trying to tokenize a string.

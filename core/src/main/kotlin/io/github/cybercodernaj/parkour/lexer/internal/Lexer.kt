@@ -1,8 +1,9 @@
 package io.github.cybercodernaj.parkour.lexer.internal
 
 import io.github.cybercodernaj.parkour.datasource.TextSource
-import io.github.cybercodernaj.parkour.exceptions.LexicalException
 import io.github.cybercodernaj.parkour.lexer.LexerBuilder
+import io.github.cybercodernaj.parkour.lexer.LexerCommons
+import io.github.cybercodernaj.parkour.lexer.LexicalException
 import io.github.cybercodernaj.parkour.utils.Position
 
 /**
@@ -12,42 +13,18 @@ import io.github.cybercodernaj.parkour.utils.Position
  * @since 0.1.0
  */
 class Lexer internal constructor(
-  private val ignorePattern: Regex = Defaults.ignorePattern,
-  private val singleLineComments: Regex? = Defaults.singleLineComments,
-  private val multilineComments: Pair<Regex, Regex>? = Defaults.multilineComments,
-  private val identifiers: Regex = Defaults.identifiers,
+  private val ignorePattern: Regex? = Regex("""\s+"""),
+  private val singleLineComments: Regex? = null,
+  private val multilineComments: Pair<Regex, Regex>? = null,
+  private val identifiers: Regex? = Regex("""[a-zA-Z_]\w*"""),
   private val hardKeywords: List<String> = emptyList(),
   private val operators: List<String> = emptyList(),
   private val separators: List<String> = emptyList(),
-  private val integerLiteral: Regex? = Defaults.integerLiteral,
-  private val floatingLiteral: Regex? = Defaults.floatingLiteral,
-  private val singleLineString: Set<String> = Defaults.singleLineString,
-  private val escapeSequences: List<Pair<Regex, (String) -> Char>> = Defaults.escapeSequences,
+  private val integerLiteral: Regex? = LexerCommons.integerLiteral,
+  private val floatingLiteral: Regex? = LexerCommons.floatingLiteral,
+  private val singleLineString: Set<String> = LexerCommons.singleLineString,
+  private val escapeSequences: List<Pair<Regex, (String) -> Char>> = listOf(),
 ) {
-  /**
-   * A list of common patterns and lists of items that most programming languages and
-   * data serialization formats.
-   *
-   * @author Nishant Aanjaney Jalan
-   * @since 0.2.0
-   */
-  object Defaults {
-    /**
-     * The lexer will skip over any strings that match this regex.
-     * This acts like a token separator.
-     *
-     * @author Nishant Aanjaney Jalan
-     * @since 0.2.0
-     */
-    val ignorePattern = Regex("""\s+""")
-    val singleLineComments: Regex? = null
-    val multilineComments: Pair<Regex, Regex>? = null
-    val identifiers = Regex("""[a-zA-Z_]\w*""")
-    val integerLiteral = Regex("""[-+]?[0-9_]+""")
-    val floatingLiteral = Regex("""[-+]?[0-9_]*\.[0-9_]+(?:[eE][-+]?[0-9_]+)?""")
-    val singleLineString: Set<String> = setOf("\"", "\'")
-    val escapeSequences: List<Pair<Regex, (String) -> Char>> = emptyList() // TODO fill this list
-  }
 
   private var position = Position(0, 0)
 
@@ -61,9 +38,6 @@ class Lexer internal constructor(
   private var tokenStream = emptyList<Token>()
 
   private var insideMultilineComment = false
-
-  private val _separators = separators.sortedByDescending(String::length)
-  private val _operators = operators.sortedByDescending(String::length)
 
   /**
    * Fetches the next [Token] from the source
@@ -115,10 +89,11 @@ class Lexer internal constructor(
         }
       }
 
-      (position pointsAt ignorePattern)
-        ?.let { match ->
-          position = position.copy(col = match.range.last + 1)
-        }
+      val ignoreMatch = position pointsAt ignorePattern
+      if (ignoreMatch != null) {
+        position = position.copy(col = ignoreMatch.range.last + 1)
+        continue
+      }
 
       (position pointsAtSome hardKeywords)
         ?.let { keyword ->
@@ -133,14 +108,14 @@ class Lexer internal constructor(
           position = token.end + 1
         }
 
-      (position pointsAtSome _operators)
+      (position pointsAtSome operators)
         ?.let { keyword ->
           val end = position.copy(col = position.col + keyword.length - 1)
           tokenStream.addOperator(position, end)
           position = end + 1
         }
 
-      (position pointsAtSome _separators)
+      (position pointsAtSome separators)
         ?.let { keyword ->
           val end = position.copy(col = position.col + keyword.length - 1)
           tokenStream.addSeparator(position, end)
@@ -299,6 +274,12 @@ class Lexer internal constructor(
    */
   private infix fun Position.pointsAt(pattern: String): Boolean {
     return currentLine.startsWith(pattern, startIndex = this.col)
+  }
+
+  fun resetPosition() {
+    position = Position(0, 0)
+    tokenIndex = 0
+    tokenStream = emptyList()
   }
 }
 

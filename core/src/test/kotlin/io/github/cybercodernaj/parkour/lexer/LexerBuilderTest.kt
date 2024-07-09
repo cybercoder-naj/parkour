@@ -4,20 +4,34 @@ import io.github.cybercodernaj.parkour.datasource.StringSource
 import io.github.cybercodernaj.parkour.lexer.internal.Token
 import io.github.cybercodernaj.parkour.testutils.assertTokens
 import io.github.cybercodernaj.parkour.utils.Position
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class LexerBuilderTest {
+  private val myLexer = lexer {
+    ignorePattern = Regex("[. ]+")
+    singleLineComments = Regex("//")
+    multilineComments = Regex("/\\*") to Regex("\\*/")
+    identifiers = Regex("[a-z][a-zA-Z0-9]+")
+
+    hardKeywords("val", "var")
+    separators("(", ")", "<", ">", ",", ".")
+    hardKeywords("val")
+    operators("*", "**", "/", "+", "-", "=", "==")
+  }
+
   @Test
   fun `initialise a default lexer`() {
     lexer {}
   }
 
+  @BeforeEach
+  fun setupEach() {
+    myLexer.resetPosition()
+  }
+
   @Test
   fun `sets ignore patterns`() {
-    val myLexer = lexer {
-      ignorePattern = Regex("\\.")
-    }
-
     myLexer.source = StringSource("hi.hello")
     assertTokens(
       myLexer,
@@ -30,10 +44,6 @@ class LexerBuilderTest {
 
   @Test
   fun `sets single line comments`() {
-    val myLexer = lexer {
-      singleLineComments = Regex("//")
-    }
-
     myLexer.source = StringSource("hi // hello\nhru")
     assertTokens(
       myLexer,
@@ -46,10 +56,6 @@ class LexerBuilderTest {
 
   @Test
   fun `sets multiline comments`() {
-    val myLexer = lexer {
-      multilineComments = Regex("/\\*") to Regex("\\*/")
-    }
-
     myLexer.source = StringSource("hi /* hello */\nhru")
     assertTokens(
       myLexer,
@@ -62,10 +68,6 @@ class LexerBuilderTest {
 
   @Test
   fun `sets identifiers rule`() {
-    val myLexer = lexer {
-      identifiers = Regex("[a-z][a-zA-Z0-9]+")
-    }
-
     myLexer.source = StringSource("hi value")
     assertTokens(
       myLexer,
@@ -78,10 +80,6 @@ class LexerBuilderTest {
 
   @Test
   fun `sets hard keywords`() {
-    val myLexer = lexer {
-      hardKeywords("val", "var")
-    }
-
     myLexer.source = StringSource("val c")
     assertTokens(
       myLexer,
@@ -94,11 +92,6 @@ class LexerBuilderTest {
 
   @Test
   fun `set separators`() {
-    val myLexer = lexer {
-      separators("(", ")", "<", ">", ",", ".")
-    }
-
-
     myLexer.source = StringSource("Array<List<Set<Int>>>")
 
     assertTokens(
@@ -119,11 +112,6 @@ class LexerBuilderTest {
 
   @Test
   fun `set operators`() {
-    val myLexer = lexer {
-      hardKeywords("val")
-      operators("*", "**", "/", "//", "+", "-", "=", "==")
-    }
-
     myLexer.source = StringSource("val diff = new - old")
 
     assertTokens(
