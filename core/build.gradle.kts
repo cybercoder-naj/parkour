@@ -20,6 +20,8 @@ repositories {
 
 dependencies {
   testImplementation(kotlin("test"))
+  implementation(libs.arrow.core)
+  implementation(libs.arrow.coroutines)
 }
 
 tasks.test {

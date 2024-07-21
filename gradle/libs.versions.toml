@@ -4,6 +4,11 @@
 lib = "0.1.0"
 dokkaVer = "1.9.20"
 mavenPublishingVer = "0.28.0"
+arrow = "1.2.4"
+
+[libraries]
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+arrow-coroutines = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow" }
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokkaVer" }

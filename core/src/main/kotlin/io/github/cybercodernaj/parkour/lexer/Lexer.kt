@@ -1,5 +1,10 @@
 package io.github.cybercodernaj.parkour.lexer
 
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.raise.OptionRaise
+import arrow.core.raise.ensureNotNull
+import arrow.core.raise.option
 import io.github.cybercodernaj.parkour.datasource.TextSource
 import io.github.cybercodernaj.parkour.exceptions.LexicalException
 import io.github.cybercodernaj.parkour.utils.Position
@@ -40,13 +45,21 @@ class Lexer(
   private val separators: Set<String> = emptySet(),
   private val literals: Literals = Literals()
 ) {
-  private var position = Position(0, 0)
+  private var position: Position = Position(0, 0)
+    set(value) {
+      if (field.line != value.line)
+        fetchCurrentLine()
+
+      field = value
+    }
 
   internal lateinit var source: TextSource
 
-  private var _currentLine: String? = null
-  private val currentLine: String
-    get() = _currentLine!!
+  /**
+   * None -> Data has not been fetched yet, or reached the end of the file.
+   * Some -> Looking at line dictated by [position].line
+   */
+  private var currentLine: Option<String> = None
 
   private var tokenIndex = 0
   private var tokenStream = emptyList<Token>()
@@ -64,234 +77,266 @@ class Lexer(
    * @since 0.1.0
    */
   internal fun nextToken(): Token {
-    if (tokenIndex >= tokenStream.size)
-      updateTokenStream()
+    currentLine.fold(
+      ifEmpty = { fetchCurrentLine() },
+      ifSome = {
+        if (position.col >= it.length) {
+          position++ // This will implicitly set the new current line
+        }
+      }
+    )
 
-    if (tokenStream.isEmpty()) {
-      adjustPositionIfNeeded()
-      return nextToken()
-    }
-
-    return tokenStream[tokenIndex++]
+    return fetchToken().getOrThrow { LexicalException("Could not identify the given token.") }
   }
 
-  private fun updateTokenStream() {
-    fetchNextLine()
-    tokenIndex = 0 // reset the counter
+  private fun fetchToken(): Option<Token> = option {
+    if (currentLine.isSome { it.isBlank() })
+      return@option Token.EOF
 
-    if (_currentLine == null) {
-      tokenStream = listOf(Token.EOF)
-      return
-    }
-
-    val tokenStream = mutableListOf<Token>()
-    while (position.col < currentLine.length) {
-      val initial = position
-
-      if (position pointsAt singleLineComments != null) {
-        position = position.copy(col = currentLine.length)
-        break
-      }
-
-      if (!insideMultilineComment && position pointsAt multilineComments?.first != null) {
-        insideMultilineComment = true
-      }
-      if (insideMultilineComment) {
-        val match = multilineComments!!.second.find(currentLine, startIndex = position.col)
-        if (match == null) {
-          position = position.copy(col = currentLine.length)
-          break
-        } else {
-          position = position.copy(col = match.range.last + 1)
-          insideMultilineComment = false
-        }
-      }
-
-      (position pointsAt ignorePattern)
-        ?.let { match ->
-          position = position.copy(col = match.range.last + 1)
-        }
-
-      (position pointsAtSome _hardKeywords)
-        ?.let { keyword ->
-          val end = position.copy(col = position.col + keyword.length - 1)
-          tokenStream.addHardKeyword(position, end)
-          position = end + 1
-        }
-
-      tryLiterals()
-        ?.let { token ->
-          tokenStream.add(token)
-          position = token.end + 1
-        }
-
-      (position pointsAtSome _operators)
-        ?.let { keyword ->
-          val end = position.copy(col = position.col + keyword.length - 1)
-          tokenStream.addOperator(position, end)
-          position = end + 1
-        }
-
-      (position pointsAtSome _separators)
-        ?.let { keyword ->
-          val end = position.copy(col = position.col + keyword.length - 1)
-          tokenStream.addSeparator(position, end)
-          position = end + 1
-        }
-
-      (position pointsAt identifiers)
-        ?.let { match ->
-          val end = position.copy(col = match.range.last)
-          tokenStream.addIdentifier(position, end)
-          position = end + 1
-        }
-
-      if (position == initial)
-        throw LexicalException("Could not identify the given token.")
-    }
-
-    this.tokenStream = tokenStream
-    adjustPositionIfNeeded()
+    val winningToken = identifiers()
+    winningToken
   }
 
-  private fun tryLiterals(): Token.Literal? {
-    (position pointsAt literals.floatingLiteral)
+  private fun OptionRaise.identifiers(): Token.Identifier {
+    val match = startsWith(identifiers)
+
+    val end = position.copy(col = match.range.last)
+    return Token.Identifier(match.value, position, end)
+  }
+
+  private fun fetchCurrentLine() {
+    currentLine = Option.fromNullable(source.fetchLine(position.line))
+  }
+
+  private fun OptionRaise.startsWith(regex: Regex?): MatchResult {
+    val line = currentLine.bind()
+    return regex
+      ?.find(line, startIndex = position.col)
       ?.let { match ->
-        if (match.value.isBlank())
-          return null
-
-        val end = position.copy(col = match.range.last)
-        match.value
-          .replace("_", "")
-          .toDoubleOrNull()?.let { value ->
-            return Token.Literal.FloatLiteral(value, position, end)
-          } ?: throw LexicalException("Double regex is badly formed.")
-      }
-
-    (position pointsAt literals.integerLiteral)
-      ?.let { match ->
-        if (match.value.isBlank())
-          return null
-
-        val end = position.copy(col = match.range.last)
-        match.value
-          .replace("_", "")
-          .toLongOrNull()?.let { value ->
-            return Token.Literal.IntLiteral(value, position, end)
-          } ?: throw LexicalException("Int regex is badly formed. Tried parsing ${match.value} to an integer")
-      }
-
-    val stringStart = position pointsAtSome literals.singleLineString
-    if (stringStart != null) {
-      val stringLit = StringBuilder().append(currentLine[position.col])
-      val start = position++
-      if (position.col >= currentLine.length)
-        throw LexicalException("String not closed in the given line")
-      while (currentLine[position.col].toString() != stringStart) {
-        val matches = literals.escapeSequences.mapNotNull { (regex, getEscapeChar) ->
-          val result = (position pointsAt regex) ?: return@mapNotNull null
-          result.value to getEscapeChar(result.value)
-        }
-
-        if (matches.isEmpty()) {
-          stringLit.append(currentLine[position.col])
-          position++
-        } else {
-          if (matches.size > 1) {
-            // TODO add a warning about this
-          }
-          val (escapeSequence, equivalentChar) = matches[0]
-          stringLit.append(equivalentChar)
-          println(escapeSequence)
-          position += escapeSequence.length
-        }
-
-        if (position.col >= currentLine.length)
-          throw LexicalException("String not closed in the given line")
-      }
-      stringLit.append(currentLine[position.col])
-      return Token.Literal.StringLiteral(stringLit.toString(), start, position)
-    }
-
-    return null
-  }
-
-  private fun fetchNextLine() {
-    _currentLine = source.fetchLine(position.line)
-  }
-
-  private fun adjustPositionIfNeeded() {
-    if (position.shouldAdvanceLine())
-      position = position.nextLine()
-  }
-
-  private fun MutableList<Token>.addIdentifier(
-    start: Position,
-    end: Position
-  ) {
-    val identifier = currentLine.substring(start..end)
-    this.add(Token.Identifier(identifier, start, end))
-  }
-
-  private fun MutableList<Token>.addHardKeyword(
-    start: Position,
-    end: Position
-  ) {
-    val identifier = currentLine.substring(start..end)
-    this.add(Token.Keyword(identifier, start, end))
-  }
-
-  private fun MutableList<Token>.addOperator(
-    start: Position,
-    end: Position
-  ) {
-    val identifier = currentLine.substring(start..end)
-    this.add(Token.Operator(identifier, start, end))
-  }
-
-  private fun MutableList<Token>.addSeparator(
-    start: Position,
-    end: Position
-  ) {
-    val identifier = currentLine.substring(start..end)
-    this.add(Token.Separator(identifier, start, end))
-  }
-
-  /**
-   * @return true if currentLine is invalidated
-   */
-  private fun Position.shouldAdvanceLine(): Boolean {
-    return this.col >= currentLine.length
-  }
-
-  /**
-   * @param pattern the regex string to look for
-   * @return a match if the [currentLine] follows the pattern at the [position]. Null if not.
-   */
-  private infix fun Position.pointsAt(pattern: Regex?): MatchResult? {
-    return pattern
-      ?.find(currentLine, startIndex = this.col)
-      ?.let { match ->
-        if (match.range.first == this.col)
+        if (match.range.first == position.col)
           match
         else null
-      }
-  }
-
-  /**
-   * @param list a list of strings to search which is being pointed at
-   * @return the string from the list that [currentLine] is being pointed at. Null if not.
-   */
-  private infix fun Position.pointsAtSome(list: Iterable<String>): String? {
-    return list.find { this.pointsAt(it) }
-  }
-
-  /**
-   * @param pattern the string to look for
-   * @return true if the [currentLine] follows the [pattern] at the [position].
-   */
-  private infix fun Position.pointsAt(pattern: String): Boolean {
-    return currentLine.startsWith(pattern, startIndex = this.col)
+      } ?: raise(None)
   }
 }
+
+private fun <A> Option<A>.getOrThrow(cause: () -> Exception): A {
+  return getOrNull() ?: throw cause()
+}
+
+//  private fun updateTokenStream() {
+//    fetchNextLine()
+//    tokenIndex = 0 // reset the counter
+//
+//    if (_currentLine == null) {
+//      tokenStream = listOf(Token.EOF)
+//      return
+//    }
+//
+//    val tokenStream = mutableListOf<Token>()
+//    while (position.col < currentLine.length) {
+//      val initial = position
+//
+//      if (position pointsAt singleLineComments != null) {
+//        position = position.copy(col = currentLine.length)
+//        break
+//      }
+//
+//      if (!insideMultilineComment && position pointsAt multilineComments?.first != null) {
+//        insideMultilineComment = true
+//      }
+//      if (insideMultilineComment) {
+//        val match = multilineComments!!.second.find(currentLine, startIndex = position.col)
+//        if (match == null) {
+//          position = position.copy(col = currentLine.length)
+//          break
+//        } else {
+//          position = position.copy(col = match.range.last + 1)
+//          insideMultilineComment = false
+//        }
+//      }
+//
+//      (position pointsAt ignorePattern)
+//        ?.let { match ->
+//          position = position.copy(col = match.range.last + 1)
+//        }
+//
+//      (position pointsAtSome _hardKeywords)
+//        ?.let { keyword ->
+//          val end = position.copy(col = position.col + keyword.length - 1)
+//          tokenStream.addHardKeyword(position, end)
+//          position = end + 1
+//        }
+//
+//      tryLiterals()
+//        ?.let { token ->
+//          tokenStream.add(token)
+//          position = token.end + 1
+//        }
+//
+//      (position pointsAtSome _operators)
+//        ?.let { keyword ->
+//          val end = position.copy(col = position.col + keyword.length - 1)
+//          tokenStream.addOperator(position, end)
+//          position = end + 1
+//        }
+//
+//      (position pointsAtSome _separators)
+//        ?.let { keyword ->
+//          val end = position.copy(col = position.col + keyword.length - 1)
+//          tokenStream.addSeparator(position, end)
+//          position = end + 1
+//        }
+//
+//      (position pointsAt identifiers)
+//        ?.let { match ->
+//          val end = position.copy(col = match.range.last)
+//          tokenStream.addIdentifier(position, end)
+//          position = end + 1
+//        }
+//
+//      if (position == initial)
+//        throw LexicalException("Could not identify the given token.")
+//    }
+//
+//    this.tokenStream = tokenStream
+//    adjustPositionIfNeeded()
+//  }
+//
+//  private fun tryLiterals(): Token.Literal? {
+//    (position pointsAt literals.floatingLiteral)
+//      ?.let { match ->
+//        if (match.value.isBlank())
+//          return null
+//
+//        val end = position.copy(col = match.range.last)
+//        match.value
+//          .replace("_", "")
+//          .toDoubleOrNull()?.let { value ->
+//            return Token.Literal.FloatLiteral(value, position, end)
+//          } ?: throw LexicalException("Double regex is badly formed.")
+//      }
+//
+//    (position pointsAt literals.integerLiteral)
+//      ?.let { match ->
+//        if (match.value.isBlank())
+//          return null
+//
+//        val end = position.copy(col = match.range.last)
+//        match.value
+//          .replace("_", "")
+//          .toLongOrNull()?.let { value ->
+//            return Token.Literal.IntLiteral(value, position, end)
+//          } ?: throw LexicalException("Int regex is badly formed. Tried parsing ${match.value} to an integer")
+//      }
+//
+//    val stringStart = position pointsAtSome literals.singleLineString
+//    if (stringStart != null) {
+//      val stringLit = StringBuilder().append(currentLine[position.col])
+//      val start = position++
+//      if (position.col >= currentLine.length)
+//        throw LexicalException("String not closed in the given line")
+//      while (currentLine[position.col].toString() != stringStart) {
+//        val matches = literals.escapeSequences.mapNotNull { (regex, getEscapeChar) ->
+//          val result = (position pointsAt regex) ?: return@mapNotNull null
+//          result.value to getEscapeChar(result.value)
+//        }
+//
+//        if (matches.isEmpty()) {
+//          stringLit.append(currentLine[position.col])
+//          position++
+//        } else {
+//          if (matches.size > 1) {
+//            // TODO add a warning about this
+//          }
+//          val (escapeSequence, equivalentChar) = matches[0]
+//          stringLit.append(equivalentChar)
+//          println(escapeSequence)
+//          position += escapeSequence.length
+//        }
+//
+//        if (position.col >= currentLine.length)
+//          throw LexicalException("String not closed in the given line")
+//      }
+//      stringLit.append(currentLine[position.col])
+//      return Token.Literal.StringLiteral(stringLit.toString(), start, position)
+//    }
+//
+//    return null
+//  }
+//
+//
+//  private fun adjustPositionIfNeeded() {
+//    if (position.shouldAdvanceLine())
+//      position = position.nextLine()
+//  }
+//
+//  private fun MutableList<Token>.addIdentifier(
+//    start: Position,
+//    end: Position
+//  ) {
+//    val identifier = currentLine.substring(start..end)
+//    this.add(Token.Identifier(identifier, start, end))
+//  }
+//
+//  private fun MutableList<Token>.addHardKeyword(
+//    start: Position,
+//    end: Position
+//  ) {
+//    val identifier = currentLine.substring(start..end)
+//    this.add(Token.Keyword(identifier, start, end))
+//  }
+//
+//  private fun MutableList<Token>.addOperator(
+//    start: Position,
+//    end: Position
+//  ) {
+//    val identifier = currentLine.substring(start..end)
+//    this.add(Token.Operator(identifier, start, end))
+//  }
+//
+//  private fun MutableList<Token>.addSeparator(
+//    start: Position,
+//    end: Position
+//  ) {
+//    val identifier = currentLine.substring(start..end)
+//    this.add(Token.Separator(identifier, start, end))
+//  }
+//
+//  /**
+//   * @return true if currentLine is invalidated
+//   */
+//  private fun Position.shouldAdvanceLine(): Boolean {
+//    return this.col >= currentLine.length
+//  }
+//
+//  /**
+//   * @param pattern the regex string to look for
+//   * @return a match if the [currentLine] follows the pattern at the [position]. Null if not.
+//   */
+//  private infix fun Position.pointsAt(pattern: Regex?): MatchResult? {
+//    return pattern
+//      ?.find(currentLine, startIndex = this.col)
+//      ?.let { match ->
+//        if (match.range.first == this.col)
+//          match
+//        else null
+//      }
+//  }
+//
+//  /**
+//   * @param list a list of strings to search which is being pointed at
+//   * @return the string from the list that [currentLine] is being pointed at. Null if not.
+//   */
+//  private infix fun Position.pointsAtSome(list: Iterable<String>): String? {
+//    return list.find { this.pointsAt(it) }
+//  }
+//
+//  /**
+//   * @param pattern the string to look for
+//   * @return true if the [currentLine] follows the [pattern] at the [position].
+//   */
+//  private infix fun Position.pointsAt(pattern: String): Boolean {
+//    return currentLine.startsWith(pattern, startIndex = this.col)
+//  }
 
