@@ -4,12 +4,9 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.raise.OptionRaise
 import arrow.core.raise.option
-import arrow.fx.coroutines.parMap
-import arrow.fx.coroutines.parZip
 import io.github.cybercodernaj.parkour.datasource.TextSource
 import io.github.cybercodernaj.parkour.exceptions.LexicalException
 import io.github.cybercodernaj.parkour.utils.Position
-import kotlinx.coroutines.runBlocking
 
 /**
  * The lexer is responsible to convert the given string into a stream of [Token]s.
@@ -49,8 +46,15 @@ class Lexer(
 ) {
   private var position: Position = Position(0, 0)
     set(value) {
+      currentLine.onSome {
+        if (value.col >= it.length && it.isNotEmpty()) {
+          position = position.nextLine()
+          return
+        }
+      }
+
       if (field.line != value.line)
-        fetchCurrentLine()
+        fetchLine(value.line)
 
       field = value
     }
@@ -80,10 +84,10 @@ class Lexer(
    */
   internal fun nextToken(): Token {
     currentLine.fold(
-      ifEmpty = { fetchCurrentLine() },
+      ifEmpty = { fetchLine() },
       ifSome = {
         if (position.col >= it.length) {
-          position++ // This will implicitly set the new current line
+          position = position.nextLine() // This will implicitly call fetchCurrentLine() on the new line
         }
       }
     )
@@ -92,19 +96,24 @@ class Lexer(
   }
 
   private fun fetchToken(): Token {
-    if (currentLine.isSome { it.isBlank() })
+    if (currentLine.isNone())
       return Token.EOF
+
+    if (currentLine.isSome { it.isBlank() }) {
+      position = position.nextLine()
+      return nextToken()
+    }
 
     fastForwardToContent()
 
     val contenders = listOf(identifiers())
-        .mapNotNull { it.getOrNull() }
+      .mapNotNull { it.getOrNull() }
 
     return if (contenders.isEmpty())
-      throw LexicalException()
+      return nextToken()
     else {
-      val winner = contenders.maxBy { it.end!! - it.start!! }
-      position = position.copy(col = winner.end!!.col + 1)
+      val winner = contenders.maxBy { it.end - it.start }
+      position = position.copy(col = winner.end.col + 1)
       winner
     }
   }
@@ -114,12 +123,11 @@ class Lexer(
    * [singleLineComments] or [multilineComments]
    */
   private fun fastForwardToContent() {
-    val endOfIgnoredContent = option {
-      val match = startsWith(ignorePattern)
-      match.range.last
-    }
-    endOfIgnoredContent.onSome {
-      position = position.copy(col = it + 1)
+    option {
+      do {
+        val ignoredMatch = startsWith(ignorePattern)
+        position = position.copy(col = ignoredMatch.range.last + 1)
+      } while (true)
     }
   }
 
@@ -130,8 +138,10 @@ class Lexer(
     Token.Identifier(match.value, position, end)
   }
 
-  private fun fetchCurrentLine() {
-    currentLine = Option.fromNullable(source.fetchLine(position.line))
+  private fun fetchLine(
+    line: Int = position.line
+  ) {
+    currentLine = Option.fromNullable(source.fetchLine(line))
   }
 
   private fun OptionRaise.startsWith(regex: Regex?): MatchResult {
