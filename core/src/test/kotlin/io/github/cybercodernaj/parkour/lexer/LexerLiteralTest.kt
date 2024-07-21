@@ -26,7 +26,7 @@ class LexerLiteralTest {
     lexer.source = StringSource("12345")
 
     val token = lexer.nextToken()
-    assertEquals(Token.Literal.IntLiteral(12345L, Position(0, 0), Position(0, 4)), token)
+    assertEquals(Token.IntLiteral(12345L, Position(0, 0), Position(0, 4)), token)
   }
 
   @Test
@@ -34,7 +34,7 @@ class LexerLiteralTest {
     lexer.source = StringSource("-12345")
 
     val token = lexer.nextToken()
-    assertEquals(Token.Literal.IntLiteral(-12345L, Position(0, 0), Position(0, 5)), token)
+    assertEquals(Token.IntLiteral(-12345L, Position(0, 0), Position(0, 5)), token)
   }
 
   @Test
@@ -42,7 +42,7 @@ class LexerLiteralTest {
     lexer.source = StringSource("3_00_000")
 
     val token = lexer.nextToken()
-    assertEquals(Token.Literal.IntLiteral(300000L, Position(0, 0), Position(0, 7)), token)
+    assertEquals(Token.IntLiteral(300000L, Position(0, 0), Position(0, 7)), token)
   }
 
   @Test
@@ -50,7 +50,7 @@ class LexerLiteralTest {
     lexer.source = StringSource("+12.42")
 
     val token = lexer.nextToken()
-    assertEquals(Token.Literal.FloatLiteral(12.42, Position(0, 0), Position(0, 5)), token)
+    assertEquals(Token.FloatLiteral(12.42, Position(0, 0), Position(0, 5)), token)
   }
 
   @Test
@@ -58,7 +58,7 @@ class LexerLiteralTest {
     lexer.source = StringSource("0.32")
 
     val token = lexer.nextToken()
-    assertEquals(Token.Literal.FloatLiteral(0.32, Position(0, 0), Position(0, 3)), token)
+    assertEquals(Token.FloatLiteral(0.32, Position(0, 0), Position(0, 3)), token)
   }
 
 
@@ -67,7 +67,7 @@ class LexerLiteralTest {
     lexer.source = StringSource("1.609e-19")
 
     val token = lexer.nextToken()
-    assertEquals(Token.Literal.FloatLiteral(1.609e-19, Position(0, 0), Position(0, 8)), token)
+    assertEquals(Token.FloatLiteral(1.609e-19, Position(0, 0), Position(0, 8)), token)
   }
 
   @Test
@@ -75,7 +75,7 @@ class LexerLiteralTest {
     lexer.source = StringSource("1.6__0_9e-1__9")
 
     val token = lexer.nextToken()
-    assertEquals(Token.Literal.FloatLiteral(1.609e-19, Position(0, 0), Position(0, 13)), token)
+    assertEquals(Token.FloatLiteral(1.609e-19, Position(0, 0), Position(0, 13)), token)
   }
 
   @Test
@@ -88,7 +88,7 @@ class LexerLiteralTest {
         Token.Keyword("char", Position(0, 0), Position(0, 3)),
         Token.Identifier("c", Position(0, 5), Position(0, 5)),
         Token.Operator("=", Position(0, 7), Position(0, 7)),
-        Token.Literal.StringLiteral("\'a\'", Position(0, 9), Position(0, 11))
+        Token.StringLiteral("\'a\'", Position(0, 9), Position(0, 11))
       )
     )
   }
@@ -103,7 +103,7 @@ class LexerLiteralTest {
         Token.Keyword("char", Position(0, 0), Position(0, 3)),
         Token.Identifier("c", Position(0, 5), Position(0, 5)),
         Token.Operator("=", Position(0, 7), Position(0, 7)),
-        Token.Literal.StringLiteral("\"abcde\"", Position(0, 9), Position(0, 15))
+        Token.StringLiteral("\"abcde\"", Position(0, 9), Position(0, 15))
       )
     )
   }
@@ -136,9 +136,9 @@ class LexerLiteralTest {
     assertTokens(
       lexer,
       listOf(
-        Token.Literal.StringLiteral("'\u1234'", Position(0, 0), Position(0, 7)),
-        Token.Literal.StringLiteral("'\n'", Position(0, 9), Position(0, 12)),
-        Token.Literal.StringLiteral("'f'", Position(0, 14), Position(0, 17)),
+        Token.StringLiteral("'\u1234'", Position(0, 0), Position(0, 7)),
+        Token.StringLiteral("'\n'", Position(0, 9), Position(0, 12)),
+        Token.StringLiteral("'f'", Position(0, 14), Position(0, 17)),
       )
     )
   }

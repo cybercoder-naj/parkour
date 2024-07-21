@@ -8,28 +8,19 @@ import io.github.cybercodernaj.parkour.utils.Position
  * @author Nishant Aanjaney Jalan
  * @since 0.1.0
  */
-internal sealed class Token(open val value: Any?, open val start: Position?, open val end: Position?) {
-  class Identifier(override val value: String, start: Position, end: Position) : Token(value, start, end)
+internal sealed class Token(val value: Any, val start: Position, val end: Position) {
+  class Identifier(value: String, start: Position, end: Position) : Token(value, start, end)
+  class Keyword(value: String, start: Position, end: Position, val soft: Boolean = false) :
+    Token(value, start, end)
+  class Operator(value: String, start: Position, end: Position) : Token(value, start, end)
+  class Separator(value: String, start: Position, end: Position) : Token(value, start, end)
+  class IntLiteral(value: Long, start: Position, end: Position) : Token(value, start, end)
+  class FloatLiteral(value: Double, start: Position, end: Position) : Token(value, start, end)
+  class StringLiteral(value: String, start: Position, end: Position) : Token(value, start, end)
+  class CharacterLiteral(value: Char, start: Position, end: Position) : Token(value, start, end)
+  class BooleanLiteral(value: Boolean, start: Position, end: Position) : Token(value, start, end)
 
-  class Keyword(override val value: String, start: Position, end: Position, val soft: Boolean = false) : Token(value, start, end)
-
-  class Operator(override val value: String, start: Position, end: Position) : Token(value, start, end)
-
-  class Separator(override val value: String, start: Position, end: Position) : Token(value, start, end)
-
-  sealed class Literal(
-    override val value: Any,
-    override val start: Position,
-    override val end: Position
-  ) : Token(value, start, end) {
-    class IntLiteral(override val value: Long, start: Position, end: Position) : Literal(value, start, end)
-    class FloatLiteral(override val value: Double, start: Position, end: Position) : Literal(value, start, end)
-    class StringLiteral(override val value: String, start: Position, end: Position) : Literal(value, start, end)
-    class CharacterLiteral(override val value: Char, start: Position, end: Position) : Literal(value, start, end)
-    class BooleanLiteral(override val value: Boolean, start: Position, end: Position) : Literal(value, start, end)
-  }
-
-  data object EOF : Token(null, null, null)
+  data object EOF : Token(Any(), Position(-1, -1), Position(-1, -1))
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -43,9 +34,9 @@ internal sealed class Token(open val value: Any?, open val start: Position?, ope
   }
 
   override fun hashCode(): Int {
-    var result = value?.hashCode() ?: 0
-    result = 31 * result + (start?.hashCode() ?: 0)
-    result = 31 * result + (end?.hashCode() ?: 0)
+    var result = value.hashCode()
+    result = 31 * result + start.hashCode()
+    result = 31 * result + end.hashCode()
     return result
   }
 
