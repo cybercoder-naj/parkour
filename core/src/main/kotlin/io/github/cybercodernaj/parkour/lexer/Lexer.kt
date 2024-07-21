@@ -3,11 +3,13 @@ package io.github.cybercodernaj.parkour.lexer
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.raise.OptionRaise
-import arrow.core.raise.ensureNotNull
 import arrow.core.raise.option
+import arrow.fx.coroutines.parMap
+import arrow.fx.coroutines.parZip
 import io.github.cybercodernaj.parkour.datasource.TextSource
 import io.github.cybercodernaj.parkour.exceptions.LexicalException
 import io.github.cybercodernaj.parkour.utils.Position
+import kotlinx.coroutines.runBlocking
 
 /**
  * The lexer is responsible to convert the given string into a stream of [Token]s.
@@ -86,22 +88,46 @@ class Lexer(
       }
     )
 
-    return fetchToken().getOrThrow { LexicalException("Could not identify the given token.") }
+    return fetchToken()
   }
 
-  private fun fetchToken(): Option<Token> = option {
+  private fun fetchToken(): Token {
     if (currentLine.isSome { it.isBlank() })
-      return@option Token.EOF
+      return Token.EOF
 
-    val winningToken = identifiers()
-    winningToken
+    fastForwardToContent()
+
+    val contenders = listOf(identifiers())
+        .mapNotNull { it.getOrNull() }
+
+    return if (contenders.isEmpty())
+      throw LexicalException()
+    else {
+      val winner = contenders.maxBy { it.end!! - it.start!! }
+      position = position.copy(col = winner.end!!.col + 1)
+      winner
+    }
   }
 
-  private fun OptionRaise.identifiers(): Token.Identifier {
+  /**
+   * Continues to move ahead until the [position] does not look at an [ignorePattern],
+   * [singleLineComments] or [multilineComments]
+   */
+  private fun fastForwardToContent() {
+    val endOfIgnoredContent = option {
+      val match = startsWith(ignorePattern)
+      match.range.last
+    }
+    endOfIgnoredContent.onSome {
+      position = position.copy(col = it + 1)
+    }
+  }
+
+  private fun identifiers(): Option<Token.Identifier> = option {
     val match = startsWith(identifiers)
 
     val end = position.copy(col = match.range.last)
-    return Token.Identifier(match.value, position, end)
+    Token.Identifier(match.value, position, end)
   }
 
   private fun fetchCurrentLine() {

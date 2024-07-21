@@ -32,6 +32,10 @@ internal data class Position(
   operator fun compareTo(end: Position): Int {
     return this.col compareTo end.col
   }
+
+  operator fun minus(other: Position): Int {
+    return this.col - other.col
+  }
 }
 
 internal operator fun Position.plus(other: Position): Position {
