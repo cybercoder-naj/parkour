@@ -1,7 +1,6 @@
 package io.github.cybercodernaj.parkour.lexer
 
-import arrow.core.None
-import arrow.core.Option
+import arrow.core.*
 import arrow.core.raise.OptionRaise
 import arrow.core.raise.option
 import io.github.cybercodernaj.parkour.datasource.TextSource
@@ -72,9 +71,16 @@ class Lexer(
 
   private var insideMultilineComment = false
 
-  private val _hardKeywords = hardKeywords.sortedByDescending(String::length)
-  private val _separators = separators.sortedByDescending(String::length)
-  private val _operators = operators.sortedByDescending(String::length)
+  private val trieMap = StringTrieMap<Kind>()
+  private enum class Kind {
+    KEYWORD, OPERATOR, SEPARATOR
+  }
+
+  init {
+    hardKeywords.forEach {
+      trieMap[it] = Kind.KEYWORD
+    }
+  }
 
   /**
    * Fetches the next [Token] from the source
@@ -83,39 +89,25 @@ class Lexer(
    * @since 0.1.0
    */
   internal fun nextToken(): Token {
+    currentLine.onNone { fetchLine() }
+
     currentLine.fold(
-      ifEmpty = { fetchLine() },
+      ifEmpty = { return Token.EOF },
       ifSome = {
-        if (position.col >= it.length) {
-          position = position.nextLine() // This will implicitly call fetchCurrentLine() on the new line
+        if (it.isBlank()) {
+          position = position.nextLine()
+          return nextToken()
         }
       }
     )
 
-    return fetchToken()
-  }
-
-  private fun fetchToken(): Token {
-    if (currentLine.isNone())
-      return Token.EOF
-
-    if (currentLine.isSome { it.isBlank() }) {
-      position = position.nextLine()
-      return nextToken()
-    }
-
     fastForwardToContent()
 
-    val contenders = listOf(identifiers())
+    val winner = listOf(identifiers())
       .mapNotNull { it.getOrNull() }
-
-    return if (contenders.isEmpty())
-      return nextToken()
-    else {
-      val winner = contenders.maxBy { it.end - it.start }
-      position = position.copy(col = winner.end.col + 1)
-      winner
-    }
+      .getWinnerOrNullOrThrow() ?: nextToken()
+    position = position.copy(col = winner.end.col + 1)
+    return winner
   }
 
   /**
@@ -158,6 +150,41 @@ class Lexer(
 
 private fun <A> Option<A>.getOrThrow(cause: () -> Exception): A {
   return getOrNull() ?: throw cause()
+}
+
+private fun List<Token>.getWinnerOrNullOrThrow(): Token? {
+  if (this.isEmpty())
+    return null
+
+  var maxSize = 0
+  val winners = mutableSetOf<Token>()
+  for (token in this) {
+    if (token.size > maxSize) {
+      winners.clear()
+      winners.add(token)
+      maxSize = token.size
+    } else if (token.size == maxSize) {
+      winners.add(token)
+    }
+  }
+
+  when (winners.size) {
+    1 -> return winners.first()
+    2 -> {
+      val keywordIdentifier = winners.separateEither {
+        when (it) {
+          is Token.Keyword -> it.left()
+          is Token.Identifier -> it.right()
+          else -> throw LexicalException("Ambiguity error")
+        }
+      }
+      // first is the lefts containing keyword.
+      // keywords triumph over identifiers.
+      return keywordIdentifier.first[0]
+    }
+
+    else -> throw LexicalException("Ambiguity error")
+  }
 }
 
 //  private fun updateTokenStream() {
