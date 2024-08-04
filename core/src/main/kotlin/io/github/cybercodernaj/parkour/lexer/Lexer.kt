@@ -7,6 +7,7 @@ import arrow.core.raise.option
 import io.github.cybercodernaj.parkour.datasource.TextSource
 import io.github.cybercodernaj.parkour.exceptions.LexicalException
 import io.github.cybercodernaj.parkour.utils.Position
+import kotlin.math.sin
 
 /**
  * The lexer is responsible to convert the given string into a stream of [Token]s.
@@ -67,8 +68,6 @@ class Lexer(
    */
   private var currentLine: Option<String> = None
 
-  private var insideMultilineComment = false
-
   private val definitions = StringTrieMap<Kind>()
 
   private enum class Kind {
@@ -106,7 +105,7 @@ class Lexer(
     // If the file is fully read, then return EOF
     currentLine.onNone { return Token.EOF }
 
-    val winner = listOf(definitions(), identifiers())
+    val winner = listOf(definitions(), literals(), identifiers())
       .mapNotNull { it.getOrNull() }
       .maxByOrNull { it.size }
 
@@ -122,36 +121,49 @@ class Lexer(
    * [singleLineComments] or [multilineComments]
    */
   private fun fastForwardToContent() {
-    option {
-      do {
+    do {
+      val ignoreEnd = option {
         val ignoredMatch = startsWith(ignorePattern)
-        position = position.copy(col = ignoredMatch.range.last + 1)
-        // This loop will break because changing the position can also change currentLine.
-      } while (true)
-    }
+        position.copy(col = ignoredMatch.range.last + 1)
+      }
+      if (ignoreEnd.isSome()) {
+        position = ignoreEnd.getOrNull()!!
+        continue
+      }
 
-    option {
-      do {
+      val singleLineCommentEnd = option {
         startsWith(singleLineComments)
         // If position is pointing at a singleLineComment, then this will continue
-        position = position.nextLine()
-      } while (true)
-    }
+        position.nextLine()
+      }
+      if (singleLineCommentEnd.isSome()) {
+        position = singleLineCommentEnd.getOrNull()!!
+        continue
+      }
 
-    option {
-      startsWith(multilineComments?.first)
-      // If position is pointing at the beginning of multiline comment
-      do {
-        val line = currentLine.bind()
-        val endMatch = multilineComments!!.second.find(line, startIndex = position.col)
-        if (endMatch == null) {
-          position = position.nextLine()
-        } else {
-          position = position.copy(col = endMatch.range.last + 1)
-          break
-        }
-      } while (true)
-    }
+      val multilineCommentEnd: Option<Position> = option {
+        startsWith(multilineComments?.first)
+        // If position is pointing at the beginning of multiline comment
+        val end: Position
+        do {
+          val line = currentLine.bind()
+          val endMatch = multilineComments!!.second.find(line, startIndex = position.col)
+          if (endMatch == null) {
+            position = position.nextLine()
+          } else {
+            end = position.copy(col = endMatch.range.last + 1)
+            break
+          }
+        } while (true)
+        end
+      }
+      if (multilineCommentEnd.isSome()) {
+        position = multilineCommentEnd.getOrNull()!!
+        continue
+      }
+
+      break
+    } while (true)
   }
 
   private fun definitions(): Option<Token> = option {
@@ -169,6 +181,28 @@ class Lexer(
     if (token == null)
       raise(None)
     token
+  }
+
+  private fun literals(): Option<Token> = option {
+    val floatingLiteral = option {
+      val match = startsWith(literals.floatingLiteral)
+      val end = position.copy(col = match.range.last)
+      val value = match.value.toDoubleOrNull() ?: raise(None)
+
+      Token.FloatLiteral(value, position, end)
+    }
+    val intLiteral = option {
+      val match = startsWith(literals.integerLiteral)
+      val end = position.copy(col = match.range.last)
+      val value = match.value.toLongOrNull() ?: raise(None)
+
+      Token.IntLiteral(value, position, end)
+    }
+    val stringLiteral = option {
+      raise(None)
+    }
+
+    listOf(floatingLiteral, intLiteral, stringLiteral).firstNotNullOfOrNull { it.getOrNull() } ?: raise(None)
   }
 
   private fun identifiers(): Option<Token.Identifier> = option {

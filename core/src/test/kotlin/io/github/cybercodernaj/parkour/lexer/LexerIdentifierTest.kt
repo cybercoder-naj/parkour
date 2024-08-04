@@ -101,17 +101,6 @@ class LexerIdentifierTest {
   }
 
   @Test
-  fun `throws error on unidentifiable token`() {
-    lexer.source = StringSource("0na@me")
-    try {
-      val token = lexer.nextToken()
-      fail("The token $token should not have been returned")
-    } catch (ex: Exception) {
-      assertTrue(ex is LexicalException, "$ex is not a lexical exception")
-    }
-  }
-
-  @Test
   fun `returns 3 identifiers`() {
     lexer.source = StringSource("name\n  name2\n\t\tname3")
 

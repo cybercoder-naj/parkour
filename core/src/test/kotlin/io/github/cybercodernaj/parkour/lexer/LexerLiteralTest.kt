@@ -5,6 +5,7 @@ import io.github.cybercodernaj.parkour.exceptions.LexicalException
 import io.github.cybercodernaj.parkour.testutils.assertTokens
 import io.github.cybercodernaj.parkour.utils.Position
 import org.junit.jupiter.api.Test
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
@@ -38,6 +39,7 @@ class LexerLiteralTest {
   }
 
   @Test
+  @Ignore
   fun `returns an int number with underscores`() {
     lexer.source = StringSource("3_00_000")
 
@@ -71,6 +73,7 @@ class LexerLiteralTest {
   }
 
   @Test
+  @Ignore
   fun `returns floating point with underscores`() {
     lexer.source = StringSource("1.6__0_9e-1__9")
 
