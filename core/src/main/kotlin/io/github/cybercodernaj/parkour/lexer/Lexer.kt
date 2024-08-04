@@ -126,7 +126,30 @@ class Lexer(
       do {
         val ignoredMatch = startsWith(ignorePattern)
         position = position.copy(col = ignoredMatch.range.last + 1)
-        // This would break because changing the position can also change currentLine.
+        // This loop will break because changing the position can also change currentLine.
+      } while (true)
+    }
+
+    option {
+      do {
+        startsWith(singleLineComments)
+        // If position is pointing at a singleLineComment, then this will continue
+        position = position.nextLine()
+      } while (true)
+    }
+
+    option {
+      startsWith(multilineComments?.first)
+      // If position is pointing at the beginning of multiline comment
+      do {
+        val line = currentLine.bind()
+        val endMatch = multilineComments!!.second.find(line, startIndex = position.col)
+        if (endMatch == null) {
+          position = position.nextLine()
+        } else {
+          position = position.copy(col = endMatch.range.last + 1)
+          break
+        }
       } while (true)
     }
   }
