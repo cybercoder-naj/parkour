@@ -1,6 +1,7 @@
 package io.github.cybercodernaj.parkour.lexer
 
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
 import arrow.core.raise.OptionRaise
 import arrow.core.raise.option
 import io.github.cybercodernaj.parkour.datasource.TextSource
@@ -38,9 +39,9 @@ class Lexer(
   private val singleLineComments: Regex? = null,
   private val multilineComments: Pair<Regex, Regex>? = null,
   private val identifiers: Regex = Regex("""[a-zA-Z_]\w*"""),
-  private val hardKeywords: Set<String> = emptySet(),
-  private val operators: Set<String> = emptySet(),
-  private val separators: Set<String> = emptySet(),
+  val hardKeywords: Set<String> = emptySet(),
+  val operators: Set<String> = emptySet(),
+  val separators: Set<String> = emptySet(),
   private val literals: Literals = Literals()
 ) {
   private var position: Position = Position(0, 0)
@@ -68,7 +69,7 @@ class Lexer(
 
   private var insideMultilineComment = false
 
-  private val _hardKeywords = StringTrieMap<Kind>()
+  private val definitions = StringTrieMap<Kind>()
 
   private enum class Kind {
     KEYWORD, OPERATOR, SEPARATOR
@@ -76,7 +77,13 @@ class Lexer(
 
   init {
     hardKeywords.forEach {
-      _hardKeywords[it] = Kind.KEYWORD
+      definitions[it] = Kind.KEYWORD
+    }
+    operators.forEach {
+      definitions[it] = Kind.OPERATOR
+    }
+    separators.forEach {
+      definitions[it] = Kind.SEPARATOR
     }
   }
 
@@ -99,7 +106,9 @@ class Lexer(
     // If the file is fully read, then return EOF
     currentLine.onNone { return Token.EOF }
 
-    val winner = listOf(identifiers()).firstNotNullOfOrNull { it.getOrNull() }
+    val winner = listOf(definitions(), identifiers())
+      .mapNotNull { it.getOrNull() }
+      .maxByOrNull { it.size }
 
     if (winner != null) {
       position = position.copy(col = winner.end.col + 1)
@@ -120,6 +129,23 @@ class Lexer(
         // This would break because changing the position can also change currentLine.
       } while (true)
     }
+  }
+
+  private fun definitions(): Option<Token> = option {
+    val line = currentLine.bind().substring(position.col)
+    val kind = definitions.getLongest(line)
+    val token = kind?.let { (k, length) ->
+      val content = line.substring(0, length)
+      val end = position + (length - 1)
+      when (k) {
+        Kind.KEYWORD -> Token.Keyword(content, position, end)
+        Kind.OPERATOR -> Token.Operator(content, position, end)
+        Kind.SEPARATOR -> Token.Separator(content, position, end)
+      }
+    }
+    if (token == null)
+      raise(None)
+    token
   }
 
   private fun identifiers(): Option<Token.Identifier> = option {
@@ -147,9 +173,6 @@ class Lexer(
   }
 }
 
-private fun <A> Option<A>.getOrThrow(cause: () -> Exception): A {
-  return getOrNull() ?: throw cause()
-}
 
 //  private fun updateTokenStream() {
 //    fetchNextLine()

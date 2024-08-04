@@ -1,6 +1,7 @@
 package io.github.cybercodernaj.parkour.lexer
 
 import io.github.cybercodernaj.parkour.datasource.StringSource
+import io.github.cybercodernaj.parkour.testutils.assertTokens
 import io.github.cybercodernaj.parkour.utils.Position
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -25,29 +26,31 @@ class LexerKeywordTest {
   }
 
   @Test
-  fun `returns 2 keywords in same line`() {
-    lexer.source = StringSource("val class")
+  fun `returns 3 keywords in same line`() {
+    lexer.source = StringSource("val class var")
 
-    val token = lexer.nextToken()
-    assertEquals(
-      Token.Keyword(
-        value = "val",
-        start = Position(0, 0),
-        end = Position(0, 2),
-        soft = false
-      ),
-      token
-    )
-
-    val token2 = lexer.nextToken()
-    assertEquals(
-      Token.Keyword(
-        value = "class",
-        start = Position(0, 4),
-        end = Position(0, 8),
-        soft = false
-      ),
-      token2
+    assertTokens(
+      lexer,
+      listOf(
+        Token.Keyword(
+          value = "val",
+          start = Position(0, 0),
+          end = Position(0, 2),
+          soft = false
+        ),
+        Token.Keyword(
+          value = "class",
+          start = Position(0, 4),
+          end = Position(0, 8),
+          soft = false
+        ),
+        Token.Keyword(
+          value = "var",
+          start = Position(0, 10),
+          end = Position(0, 12),
+          soft = false
+        ),
+      )
     )
   }
 
@@ -105,5 +108,26 @@ class LexerKeywordTest {
 
     val token3 = lexer.nextToken()
     assertEquals(Token.EOF, token3)
+  }
+
+  @Test
+  fun `differentiate between keyword and identifier`() {
+    lexer.source = StringSource("val value")
+
+    assertTokens(
+      lexer,
+      listOf(
+        Token.Keyword(
+          value = "val",
+          start = Position(0, 0),
+          end = Position(0, 2)
+        ),
+        Token.Identifier(
+          value = "value",
+          start = Position(0, 4),
+          end = Position(0, 8)
+        )
+      )
+    )
   }
 }

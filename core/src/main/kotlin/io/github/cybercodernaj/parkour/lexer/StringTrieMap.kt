@@ -24,6 +24,29 @@ internal class StringTrieMap<V> {
     }
     return if (node.terminal) node.value else null
   }
+
+  /**
+   * The [content] will walk down the trie to find a terminal value with the highest depth.
+   *
+   * @param content the line to find the longest match
+   * @return the terminal value and the depth of trie traversed. Null if not found
+   */
+  fun getLongest(content: String): Pair<V, Int>? {
+    var node = root
+    var candidate: V? = null
+    var depth = 0
+    for (elem in content) {
+      if (elem !in node.children) {
+        return candidate?.let { it to depth }
+      }
+      node = node.children[elem]!!
+      depth++
+      if (node.terminal) {
+        candidate = node.value!!
+      }
+    }
+    return candidate?.let { it to depth }
+  }
 }
 
 private data class TrieNode<T, U>(

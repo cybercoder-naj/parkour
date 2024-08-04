@@ -23,7 +23,7 @@ internal sealed class Token(val value: Any, val start: Position, val end: Positi
   data object EOF : Token(Any(), Position(-1, -1), Position(-1, -1))
 
   val size: Int
-    get() = this.end - this.start
+    get() = this.end - this.start + 1
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
