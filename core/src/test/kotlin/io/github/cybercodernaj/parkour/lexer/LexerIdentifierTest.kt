@@ -101,7 +101,6 @@ class LexerIdentifierTest {
   }
 
   @Test
-  @Ignore
   fun `throws error on unidentifiable token`() {
     lexer.source = StringSource("0na@me")
     try {

@@ -29,6 +29,7 @@ internal sealed class Token(val value: Any, val start: Position, val end: Positi
     if (this === other) return true
     if (other !is Token) return false
 
+    if (this::class.simpleName != other::class.simpleName) return false
     if (value != other.value) return false
     if (start != other.start) return false
     if (end != other.end) return false

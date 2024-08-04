@@ -66,19 +66,17 @@ class Lexer(
    */
   private var currentLine: Option<String> = None
 
-  private var tokenIndex = 0
-  private var tokenStream = emptyList<Token>()
-
   private var insideMultilineComment = false
 
-  private val trieMap = StringTrieMap<Kind>()
+  private val _hardKeywords = StringTrieMap<Kind>()
+
   private enum class Kind {
     KEYWORD, OPERATOR, SEPARATOR
   }
 
   init {
     hardKeywords.forEach {
-      trieMap[it] = Kind.KEYWORD
+      _hardKeywords[it] = Kind.KEYWORD
     }
   }
 
@@ -89,25 +87,25 @@ class Lexer(
    * @since 0.1.0
    */
   internal fun nextToken(): Token {
+    // This is when the currentLine has not been loaded yet
     currentLine.onNone { fetchLine() }
 
-    currentLine.fold(
-      ifEmpty = { return Token.EOF },
-      ifSome = {
-        if (it.isBlank()) {
-          position = position.nextLine()
-          return nextToken()
-        }
-      }
-    )
-
+    // Empty lines and ignored contents should be skipped
+    while (currentLine.isSome { it.isEmpty() }) {
+      position = position.nextLine()
+    }
     fastForwardToContent()
 
-    val winner = listOf(identifiers())
-      .mapNotNull { it.getOrNull() }
-      .getWinnerOrNullOrThrow() ?: nextToken()
-    position = position.copy(col = winner.end.col + 1)
-    return winner
+    // If the file is fully read, then return EOF
+    currentLine.onNone { return Token.EOF }
+
+    val winner = listOf(identifiers()).firstNotNullOfOrNull { it.getOrNull() }
+
+    if (winner != null) {
+      position = position.copy(col = winner.end.col + 1)
+      return winner
+    }
+    throw LexicalException("")
   }
 
   /**
@@ -119,6 +117,7 @@ class Lexer(
       do {
         val ignoredMatch = startsWith(ignorePattern)
         position = position.copy(col = ignoredMatch.range.last + 1)
+        // This would break because changing the position can also change currentLine.
       } while (true)
     }
   }
@@ -150,41 +149,6 @@ class Lexer(
 
 private fun <A> Option<A>.getOrThrow(cause: () -> Exception): A {
   return getOrNull() ?: throw cause()
-}
-
-private fun List<Token>.getWinnerOrNullOrThrow(): Token? {
-  if (this.isEmpty())
-    return null
-
-  var maxSize = 0
-  val winners = mutableSetOf<Token>()
-  for (token in this) {
-    if (token.size > maxSize) {
-      winners.clear()
-      winners.add(token)
-      maxSize = token.size
-    } else if (token.size == maxSize) {
-      winners.add(token)
-    }
-  }
-
-  when (winners.size) {
-    1 -> return winners.first()
-    2 -> {
-      val keywordIdentifier = winners.separateEither {
-        when (it) {
-          is Token.Keyword -> it.left()
-          is Token.Identifier -> it.right()
-          else -> throw LexicalException("Ambiguity error")
-        }
-      }
-      // first is the lefts containing keyword.
-      // keywords triumph over identifiers.
-      return keywordIdentifier.first[0]
-    }
-
-    else -> throw LexicalException("Ambiguity error")
-  }
 }
 
 //  private fun updateTokenStream() {
